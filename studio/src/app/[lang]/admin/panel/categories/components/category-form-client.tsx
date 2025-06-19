@@ -15,16 +15,16 @@ import { Loader2, Save, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const categorySchema = z.object({
-  name: z.string().min(1, "Category name cannot be empty."),
-  description: z.string().optional(),
+  nombre: z.string().min(1, "Category name cannot be empty."),
+  descripcion: z.string().optional(),
 });
 
 type CategoryFormData = z.infer<typeof categorySchema>;
 
 interface CategoryFormClientProps {
   category?: Category;
-  onSave: (data: Category) => Promise<void>; 
-  onDelete?: (categoryId: string) => Promise<void>;
+  onSave: (data: Partial<Category>) => Promise<void>;
+  onDelete?: (categoryId: string | number) => Promise<void>;
   lang: string; 
   texts: any; // Dictionary texts for categories
 }
@@ -36,8 +36,8 @@ export function CategoryFormClient({ category, onSave, onDelete, lang, texts }: 
   const form = useForm<CategoryFormData>({
     resolver: zodResolver(categorySchema),
     defaultValues: category || {
-      name: '',
-      description: '',
+      nombre: '',
+      descripcion: '',
     },
   });
   
@@ -45,25 +45,25 @@ export function CategoryFormClient({ category, onSave, onDelete, lang, texts }: 
     if(category) {
       form.reset(category);
     } else {
-      form.reset({ name: '', description: ''}); // Ensure form resets for 'add new'
+      form.reset({ nombre: '', descripcion: ''}); // Ensure form resets for 'add new'
     }
   }, [category, form]);
 
   const onSubmitHandler: SubmitHandler<CategoryFormData> = async (data) => {
     setIsSaving(true);
     try {
-      const categoryToSave: Category = {
-        id: category?.id || `category_${Date.now()}`, 
-        ...data,
-      };
-      await onSave(categoryToSave); 
+      const categoryToSave: Partial<Category> = { ...data };
+      if (category?.id) {
+        categoryToSave.id = category.id;
+      }
+      await onSave(categoryToSave);
       // Toast for success is handled in ManageCategoriesContent after successful navigation/refresh
       // to avoid double toasts if navigation also shows one.
       // However, if onSave itself directly signals success via toast, it's fine here too.
       // Let's assume ManageCategoriesContent handles success toast on navigation.
       toast({
         title: texts.toastCategorySaved || "Category Saved!",
-        description: `${data.name} has been successfully saved.`,
+        description: `${data.nombre} has been successfully saved.`,
       });
     } catch (error: any) {
       // Error handling is now primarily in ManageCategoriesContent,
@@ -100,14 +100,14 @@ export function CategoryFormClient({ category, onSave, onDelete, lang, texts }: 
             <CardDescription>{/* Add a description if needed */}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <FormField control={form.control} name="name" render={({ field }) => (
+            <FormField control={form.control} name="nombre" render={({ field }) => (
               <FormItem>
                 <FormLabel>{texts.categoryNameLabel}</FormLabel>
                 <FormControl><Input placeholder={texts.categoryNamePlaceholder} {...field} /></FormControl>
                 <FormMessage />
               </FormItem>
             )} />
-            <FormField control={form.control} name="description" render={({ field }) => (
+            <FormField control={form.control} name="descripcion" render={({ field }) => (
               <FormItem>
                 <FormLabel>{texts.categoryDescriptionLabel}</FormLabel>
                 <FormControl><Textarea placeholder={texts.categoryDescriptionPlaceholder} {...field} rows={4} /></FormControl>
