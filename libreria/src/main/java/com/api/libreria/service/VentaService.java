@@ -41,7 +41,7 @@ public class VentaService  {
         // Validar stock
         for (CartItem item : cart.getItems()) {
             if (item.getBook().getStock() < item.getCantidad()) {
-                throw new RuntimeException("Stock insuficiente para: " + item.getBook().getTitle());
+                throw new RuntimeException("Stock insuficiente para: " + item.getBook().getTitulo());
             }
         }
 

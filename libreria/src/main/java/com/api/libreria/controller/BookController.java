@@ -46,14 +46,14 @@ public class BookController {
         Book existing = bookRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Libro no encontrado"));
 
-        existing.setTitle(request.getTitle());
-        existing.setAuthor(request.getAuthor());
+        existing.setTitulo(request.getTitulo());
+        existing.setAutor(request.getAutor());
         existing.setEditorial(request.getEditorial());
-        existing.setCategory(request.getCategory());
-        existing.setPrice(request.getPrice());
+        existing.setCategoria(request.getCategoria());
+        existing.setPrecio(request.getPrecio());
         existing.setStock(request.getStock());
-        existing.setDescription(request.getDescription());
-        existing.setImageUrl(request.getImageUrl());
+        existing.setDescripcion(request.getDescripcion());
+        existing.setCoverImage(request.getCoverImage());
 
         Book updated = bookRepository.save(existing);
         return ResponseEntity.ok(updated);

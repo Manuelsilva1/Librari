@@ -16,11 +16,12 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String username;
+    // nombre de usuario o nombre público
+    private String nombre;
 
     private String email;
 
     private String password; // luego esto será hasheado
 
-    private String role; // Ej: "USER" o "ADMIN"
+    private String rol; // Ej: "USER" o "ADMIN"
 }

@@ -43,7 +43,7 @@ public class VentaController {
         return ventaRepository.findByUsuarioId(userId, pageable);
     }
 
-    private Long getUserId(String username) {
-        return userRepository.findByUsername(username).orElseThrow().getId();
+    private Long getUserId(String nombre) {
+        return userRepository.findByNombre(nombre).orElseThrow().getId();
     }
 }

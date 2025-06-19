@@ -52,7 +52,7 @@ public class CartService {
             item.setCart(cart);
             item.setBook(book);
             item.setCantidad(quantity);
-            item.setPrecioUnitario(book.getPrice());
+            item.setPrecioUnitario(book.getPrecio());
             cartItemRepository.save(item);
         }
 
