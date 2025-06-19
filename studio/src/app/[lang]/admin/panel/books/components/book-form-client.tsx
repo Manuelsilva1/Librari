@@ -241,14 +241,18 @@ export function BookFormClient({ book, onSave, lang, isLoadingExternally }: Book
                   <FormField control={form.control} name="editorialId" render={({ field }) => (
                     <FormItem>
                       <FormLabel>Publisher (Optional)</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value || ''} defaultValue={field.value || ''}>
+                      <Select
+                        onValueChange={(value) => field.onChange(value === 'none' ? null : value)}
+                        value={field.value ?? 'none'}
+                        defaultValue={field.value ?? 'none'}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select a publisher" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">No Publisher</SelectItem>
+                          <SelectItem value="none">No Publisher</SelectItem>
                           {editorials.map((editorial) => (
                             <SelectItem key={editorial.id} value={String(editorial.id)}>
                               {editorial.nombre}

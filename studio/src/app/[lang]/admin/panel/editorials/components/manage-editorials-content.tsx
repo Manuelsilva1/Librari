@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useCallback } from 'react'; // Added useCallback
+import React, { useState, useEffect, useCallback, use } from 'react'; // Added useCallback
 import { useSearchParams, useRouter } from 'next/navigation';
 import type { Editorial, ApiResponseError } from '@/types'; // Added ApiResponseError
 // Import actual API service functions
@@ -17,7 +17,7 @@ import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast'; // Added useToast
 
 interface ManageEditorialsContentProps {
-  params: { lang: string }; // Changed lang to be a required string
+  params: { lang: string } | Promise<{ lang: string }>; // Changed lang to be a required string
   initialEditorials: Editorial[];
   texts: any;
 }
@@ -27,7 +27,7 @@ export function ManageEditorialsContent({ params, initialEditorials, texts }: Ma
   const searchParams = useSearchParams();
   const { toast } = useToast(); // Initialized useToast
 
-  const lang = params.lang; // Directly use lang from params
+  const { lang } = use(params); // Unwrap params
 
   const action = searchParams.get('action');
   const editorialId = searchParams.get('id');
