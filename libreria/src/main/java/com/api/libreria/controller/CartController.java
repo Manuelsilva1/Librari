@@ -112,7 +112,7 @@ public class CartController {
             CartItem item = new CartItem();
             item.setBook(book);
             item.setCantidad(cantidad);
-            item.setPrecioUnitario(book.getPrice());
+            item.setPrecioUnitario(book.getPrecio());
             item.setCart(cart);
             cartItemRepository.save(item);
         }
@@ -217,7 +217,7 @@ public class CartController {
         return builder.body(cart);
     }
 
-    private Long getUserId(String username) {
-        return userRepository.findByUsername(username).orElseThrow().getId();
+    private Long getUserId(String nombre) {
+        return userRepository.findByNombre(nombre).orElseThrow().getId();
     }
 }

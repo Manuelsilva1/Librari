@@ -44,7 +44,7 @@ public class UserController {
 
     @GetMapping("/perfil")
     public ResponseEntity<User> getProfile(@AuthenticationPrincipal UserDetails userDetails) {
-        return userService.getUserByUsername(userDetails.getUsername())
+        return userService.getUserByNombre(userDetails.getUsername())
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

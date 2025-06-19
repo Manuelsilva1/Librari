@@ -24,7 +24,8 @@ public class OrderItem {
     @JoinColumn(name = "book_id")
     private Book book;
 
-    private Integer quantity;
+    private Integer cantidad;
 
-    private Double price;  // Precio en el momento de la compra
+    // Precio en el momento de la compra
+    private Double precioUnitario;
 }

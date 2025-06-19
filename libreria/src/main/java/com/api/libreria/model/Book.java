@@ -18,24 +18,20 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String title;
+    private String titulo;
 
-    private String author;
+    private String autor;
 
     private String editorial;
 
-    private String category;
+    private String categoria;
 
-    private Double price;
+    private Double precio;
 
     private Integer stock;
 
     @Column(length = 2000)
-    private String description;
+    private String descripcion;
 
-    private String imageUrl;
-
-    public void setTitulo(String titulo) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
+    private String coverImage;
 }
