@@ -28,15 +28,15 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
-        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
-            return ResponseEntity.badRequest().body("Username already exists");
+        if (userRepository.findByNombre(request.getNombre()).isPresent()) {
+            return ResponseEntity.badRequest().body("Nombre de usuario ya existe");
         }
 
         User user = new User();
-        user.setUsername(request.getUsername());
+        user.setNombre(request.getNombre());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole("USER"); // default role
+        user.setRol("USER"); // default role
 
         userRepository.save(user);
         return ResponseEntity.ok("User registered successfully");

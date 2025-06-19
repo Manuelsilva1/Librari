@@ -52,8 +52,8 @@ public class OrderService {
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(order);
             orderItem.setBook(item.getBook());
-            orderItem.setQuantity(item.getCantidad());
-            orderItem.setPrice(item.getPrecioUnitario());
+            orderItem.setCantidad(item.getCantidad());
+            orderItem.setPrecioUnitario(item.getPrecioUnitario());
             orderItemRepository.save(orderItem);
 
             total += item.getCantidad() * item.getPrecioUnitario();
