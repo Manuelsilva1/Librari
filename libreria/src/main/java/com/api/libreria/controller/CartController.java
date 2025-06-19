@@ -217,7 +217,7 @@ public class CartController {
         return builder.body(cart);
     }
 
-    private Long getUserId(String nombre) {
-        return userRepository.findByNombre(nombre).orElseThrow().getId();
+    private Long getUserId(String username) {
+        return userRepository.findByUsername(username).orElseThrow().getId();
     }
 }

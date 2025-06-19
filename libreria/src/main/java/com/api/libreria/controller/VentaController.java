@@ -59,6 +59,6 @@ public class VentaController {
     }
 
     private Long getUserId(String nombre) {
-        return userRepository.findByNombre(nombre).orElseThrow().getId();
+        return userRepository.findByEmail(nombre).orElseThrow().getId();
     }
 }

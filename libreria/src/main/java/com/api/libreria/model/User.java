@@ -17,11 +17,11 @@ public class User {
     private Long id;
 
     // nombre de usuario o nombre público
-    private String nombre;
+    private String username;
 
     private String email;
 
     private String password; // luego esto será hasheado
 
-    private String rol; // Ej: "USER" o "ADMIN"
+    private String role; // Ej: "USER" o "ADMIN"
 }
