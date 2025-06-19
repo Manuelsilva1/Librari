@@ -4,6 +4,7 @@ import com.api.libreria.model.Venta;
 import com.api.libreria.repository.UserRepository;
 import com.api.libreria.repository.VentaRepository;
 import com.api.libreria.service.VentaService;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +42,20 @@ public class VentaController {
                                  Pageable pageable) {
         Long userId = getUserId(userDetails.getUsername());
         return ventaRepository.findByUsuarioId(userId, pageable);
+    }
+
+    @GetMapping("/admin")
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<Venta> getAllVentasAdmin() {
+        return ventaService.getAllVentas();
+    }
+
+    @GetMapping("/admin/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Venta> getVentaAdminById(@PathVariable Long id) {
+        return ventaService.getVentaById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     private Long getUserId(String nombre) {

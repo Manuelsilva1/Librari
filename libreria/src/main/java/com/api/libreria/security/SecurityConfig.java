@@ -44,6 +44,7 @@ public class SecurityConfig {
                 // rutas protegidas
                 .requestMatchers("/api/books/**").hasRole("ADMIN")
                 .requestMatchers("/api/ofertas/**").hasRole("ADMIN")
+                .requestMatchers("/api/ventas/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )

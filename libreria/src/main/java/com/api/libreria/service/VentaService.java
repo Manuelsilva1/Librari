@@ -81,4 +81,12 @@ public class VentaService  {
 
         return venta;
     }
+
+    public List<Venta> getAllVentas() {
+        return ventaRepository.findAll();
+    }
+
+    public Optional<Venta> getVentaById(Long id) {
+        return ventaRepository.findById(id);
+    }
 }
