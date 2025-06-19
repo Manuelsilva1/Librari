@@ -72,11 +72,28 @@ export const loginUser = async (credentials: { email: string; password: string }
 
 // --- Books ---
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const getBooks = async (params?: Record<string, any>): Promise<Book[]> => {
-  if (API_MODE === 'mock') return mockApi.mockGetBooks(); // params for mock?
-  const query = params ? `?${new URLSearchParams(params).toString()}` : '';
-  return fetchApi<Book[]>(`/api/books${query}`);
+export const getBooks = async (
+  params: Record<string, any> = {},      // page, size, sort, etc.
+): Promise<Book[]> => {
+  if (API_MODE === 'mock') {
+    return mockApi.mockGetBooks();       // asegúrate de que esto retorna Book[]
+  }
+
+  const query = new URLSearchParams(params).toString();   // '' si params === {}
+  const page: Page<Book> = await fetchApi<Page<Book>>(`/api/books${query ? '?' + query : ''}`);
+
+  return page.content;                   // 👈  ahora sí es Book[]
 };
+
+interface Page<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+  size: number;
+  first: boolean;
+  last: boolean;
+}
 
 export const getBookById = async (id: string | number): Promise<Book> => {
   if (API_MODE === 'mock') return mockApi.mockGetBookById(id);

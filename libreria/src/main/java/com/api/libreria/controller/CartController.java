@@ -19,7 +19,7 @@ public class CartController {
     private final UserRepository userRepository;
 
     public CartController(CartRepository cartRepository, CartItemRepository cartItemRepository,
-                          BookRepository bookRepository, UserRepository userRepository) {
+            BookRepository bookRepository, UserRepository userRepository) {
         this.cartRepository = cartRepository;
         this.cartItemRepository = cartItemRepository;
         this.bookRepository = bookRepository;
@@ -29,7 +29,7 @@ public class CartController {
     // GET carrito actual
     @GetMapping
     public ResponseEntity<Cart> getCart(@AuthenticationPrincipal UserDetails userDetails,
-                                        @RequestParam(required = false) String guestId) {
+            @RequestParam(required = false) String guestId) {
         Long userId = null;
         boolean newGuest = false;
         if (userDetails != null) {
@@ -43,15 +43,17 @@ public class CartController {
 
         Cart cart;
         if (userId != null) {
+            final Long uid = userId;
             cart = cartRepository.findByUsuarioId(userId).orElseGet(() -> {
                 Cart newCart = new Cart();
-                newCart.setUsuarioId(userId);
+                newCart.setUsuarioId(uid);
                 return cartRepository.save(newCart);
             });
         } else {
+            String gtId = guestId;
             cart = cartRepository.findByGuestId(guestId).orElseGet(() -> {
                 Cart newCart = new Cart();
-                newCart.setGuestId(guestId);
+                newCart.setGuestId(gtId);
                 return cartRepository.save(newCart);
             });
         }
@@ -66,9 +68,9 @@ public class CartController {
     // POST agregar libro al carrito
     @PostMapping("/add")
     public ResponseEntity<Cart> addToCart(@AuthenticationPrincipal UserDetails userDetails,
-                                          @RequestParam(required = false) String guestId,
-                                          @RequestParam Long bookId,
-                                          @RequestParam Integer cantidad) {
+            @RequestParam(required = false) String guestId,
+            @RequestParam Long bookId,
+            @RequestParam Integer cantidad) {
 
         Long userId = null;
         boolean newGuest = false;
@@ -81,15 +83,17 @@ public class CartController {
 
         Cart cart;
         if (userId != null) {
+            final Long uid = userId;
             cart = cartRepository.findByUsuarioId(userId).orElseGet(() -> {
                 Cart newCart = new Cart();
-                newCart.setUsuarioId(userId);
+                newCart.setUsuarioId(uid);
                 return cartRepository.save(newCart);
             });
         } else {
+            String gtId = guestId;
             cart = cartRepository.findByGuestId(guestId).orElseGet(() -> {
                 Cart newCart = new Cart();
-                newCart.setGuestId(guestId);
+                newCart.setGuestId(gtId);
                 return cartRepository.save(newCart);
             });
         }
@@ -97,8 +101,8 @@ public class CartController {
         Book book = bookRepository.findById(bookId).orElseThrow(() -> new RuntimeException("Libro no encontrado"));
 
         // Buscamos si el item ya existe en el carrito
-        Optional<CartItem> existingItem = cart.getItems() == null ? Optional.empty() :
-            cart.getItems().stream().filter(item -> item.getBook().getId().equals(bookId)).findFirst();
+        Optional<CartItem> existingItem = cart.getItems() == null ? Optional.empty()
+                : cart.getItems().stream().filter(item -> item.getBook().getId().equals(bookId)).findFirst();
 
         if (existingItem.isPresent()) {
             CartItem item = existingItem.get();
@@ -128,9 +132,9 @@ public class CartController {
     // PUT actualizar cantidad de un item
     @PutMapping("/items/{itemId}")
     public ResponseEntity<Cart> updateItemQuantity(@AuthenticationPrincipal UserDetails userDetails,
-                                                   @RequestParam(required = false) String guestId,
-                                                   @PathVariable Long itemId,
-                                                   @RequestParam Integer cantidad) {
+            @RequestParam(required = false) String guestId,
+            @PathVariable Long itemId,
+            @RequestParam Integer cantidad) {
         Long userId = null;
         boolean newGuest = false;
         if (userDetails != null) {
@@ -140,10 +144,10 @@ public class CartController {
             newGuest = true;
         }
 
-        Cart cart = userId != null ?
-                cartRepository.findByUsuarioId(userId)
-                        .orElseThrow(() -> new RuntimeException("Carrito no encontrado")) :
-                cartRepository.findByGuestId(guestId)
+        Cart cart = userId != null
+                ? cartRepository.findByUsuarioId(userId)
+                        .orElseThrow(() -> new RuntimeException("Carrito no encontrado"))
+                : cartRepository.findByGuestId(guestId)
                         .orElseThrow(() -> new RuntimeException("Carrito no encontrado"));
 
         CartItem item = cartItemRepository.findById(itemId)
@@ -175,8 +179,8 @@ public class CartController {
     // DELETE eliminar item del carrito
     @DeleteMapping("/items/{itemId}")
     public ResponseEntity<Cart> removeItem(@AuthenticationPrincipal UserDetails userDetails,
-                                           @RequestParam(required = false) String guestId,
-                                           @PathVariable Long itemId) {
+            @RequestParam(required = false) String guestId,
+            @PathVariable Long itemId) {
         Long userId = null;
         boolean newGuest = false;
         if (userDetails != null) {
@@ -186,10 +190,10 @@ public class CartController {
             newGuest = true;
         }
 
-        Cart cart = userId != null ?
-                cartRepository.findByUsuarioId(userId)
-                        .orElseThrow(() -> new RuntimeException("Carrito no encontrado")) :
-                cartRepository.findByGuestId(guestId)
+        Cart cart = userId != null
+                ? cartRepository.findByUsuarioId(userId)
+                        .orElseThrow(() -> new RuntimeException("Carrito no encontrado"))
+                : cartRepository.findByGuestId(guestId)
                         .orElseThrow(() -> new RuntimeException("Carrito no encontrado"));
 
         CartItem item = cartItemRepository.findById(itemId)
