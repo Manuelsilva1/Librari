@@ -5,15 +5,12 @@ import com.api.libreria.repository.*;
 import org.springframework.http.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
 @RestController
 @RequestMapping("/api/cart")
-// Allow access to regular users and admins
-@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
 public class CartController {
 
     private final CartRepository cartRepository;
@@ -31,30 +28,71 @@ public class CartController {
 
     // GET carrito actual
     @GetMapping
-    public ResponseEntity<Cart> getCart(@AuthenticationPrincipal UserDetails userDetails) {
-        Long userId = getUserId(userDetails.getUsername());
+    public ResponseEntity<Cart> getCart(@AuthenticationPrincipal UserDetails userDetails,
+                                        @RequestParam(required = false) String guestId) {
+        Long userId = null;
+        boolean newGuest = false;
+        if (userDetails != null) {
+            userId = getUserId(userDetails.getUsername());
+        } else {
+            if (guestId == null) {
+                guestId = UUID.randomUUID().toString();
+                newGuest = true;
+            }
+        }
 
-        Cart cart = cartRepository.findByUsuarioId(userId).orElseGet(() -> {
-            Cart newCart = new Cart();
-            newCart.setUsuarioId(userId);
-            return cartRepository.save(newCart);
-        });
+        Cart cart;
+        if (userId != null) {
+            cart = cartRepository.findByUsuarioId(userId).orElseGet(() -> {
+                Cart newCart = new Cart();
+                newCart.setUsuarioId(userId);
+                return cartRepository.save(newCart);
+            });
+        } else {
+            cart = cartRepository.findByGuestId(guestId).orElseGet(() -> {
+                Cart newCart = new Cart();
+                newCart.setGuestId(guestId);
+                return cartRepository.save(newCart);
+            });
+        }
 
-        return ResponseEntity.ok(cart);
+        ResponseEntity.BodyBuilder builder = ResponseEntity.ok();
+        if (newGuest) {
+            builder.header("X-Guest-Id", guestId);
+        }
+        return builder.body(cart);
     }
 
     // POST agregar libro al carrito
     @PostMapping("/add")
     public ResponseEntity<Cart> addToCart(@AuthenticationPrincipal UserDetails userDetails,
+                                          @RequestParam(required = false) String guestId,
                                           @RequestParam Long bookId,
                                           @RequestParam Integer cantidad) {
 
-        Long userId = getUserId(userDetails.getUsername());
-        Cart cart = cartRepository.findByUsuarioId(userId).orElseGet(() -> {
-            Cart newCart = new Cart();
-            newCart.setUsuarioId(userId);
-            return cartRepository.save(newCart);
-        });
+        Long userId = null;
+        boolean newGuest = false;
+        if (userDetails != null) {
+            userId = getUserId(userDetails.getUsername());
+        } else if (guestId == null) {
+            guestId = UUID.randomUUID().toString();
+            newGuest = true;
+        }
+
+        Cart cart;
+        if (userId != null) {
+            cart = cartRepository.findByUsuarioId(userId).orElseGet(() -> {
+                Cart newCart = new Cart();
+                newCart.setUsuarioId(userId);
+                return cartRepository.save(newCart);
+            });
+        } else {
+            cart = cartRepository.findByGuestId(guestId).orElseGet(() -> {
+                Cart newCart = new Cart();
+                newCart.setGuestId(guestId);
+                return cartRepository.save(newCart);
+            });
+        }
 
         Book book = bookRepository.findById(bookId).orElseThrow(() -> new RuntimeException("Libro no encontrado"));
 
@@ -75,19 +113,38 @@ public class CartController {
             cartItemRepository.save(item);
         }
 
-        cart = cartRepository.findByUsuarioId(userId).get();
-        return ResponseEntity.ok(cart);
+        if (userId != null) {
+            cart = cartRepository.findByUsuarioId(userId).get();
+        } else {
+            cart = cartRepository.findByGuestId(guestId).get();
+        }
+        ResponseEntity.BodyBuilder builder = ResponseEntity.ok();
+        if (newGuest) {
+            builder.header("X-Guest-Id", guestId);
+        }
+        return builder.body(cart);
     }
 
     // PUT actualizar cantidad de un item
     @PutMapping("/items/{itemId}")
     public ResponseEntity<Cart> updateItemQuantity(@AuthenticationPrincipal UserDetails userDetails,
+                                                   @RequestParam(required = false) String guestId,
                                                    @PathVariable Long itemId,
                                                    @RequestParam Integer cantidad) {
-        Long userId = getUserId(userDetails.getUsername());
+        Long userId = null;
+        boolean newGuest = false;
+        if (userDetails != null) {
+            userId = getUserId(userDetails.getUsername());
+        } else if (guestId == null) {
+            guestId = UUID.randomUUID().toString();
+            newGuest = true;
+        }
 
-        Cart cart = cartRepository.findByUsuarioId(userId)
-                .orElseThrow(() -> new RuntimeException("Carrito no encontrado"));
+        Cart cart = userId != null ?
+                cartRepository.findByUsuarioId(userId)
+                        .orElseThrow(() -> new RuntimeException("Carrito no encontrado")) :
+                cartRepository.findByGuestId(guestId)
+                        .orElseThrow(() -> new RuntimeException("Carrito no encontrado"));
 
         CartItem item = cartItemRepository.findById(itemId)
                 .orElseThrow(() -> new RuntimeException("Item no encontrado"));
@@ -103,18 +160,37 @@ public class CartController {
             cartItemRepository.save(item);
         }
 
-        cart = cartRepository.findByUsuarioId(userId).orElse(cart);
-        return ResponseEntity.ok(cart);
+        if (userId != null) {
+            cart = cartRepository.findByUsuarioId(userId).orElse(cart);
+        } else {
+            cart = cartRepository.findByGuestId(guestId).orElse(cart);
+        }
+        ResponseEntity.BodyBuilder builder = ResponseEntity.ok();
+        if (newGuest) {
+            builder.header("X-Guest-Id", guestId);
+        }
+        return builder.body(cart);
     }
 
     // DELETE eliminar item del carrito
     @DeleteMapping("/items/{itemId}")
     public ResponseEntity<Cart> removeItem(@AuthenticationPrincipal UserDetails userDetails,
+                                           @RequestParam(required = false) String guestId,
                                            @PathVariable Long itemId) {
-        Long userId = getUserId(userDetails.getUsername());
+        Long userId = null;
+        boolean newGuest = false;
+        if (userDetails != null) {
+            userId = getUserId(userDetails.getUsername());
+        } else if (guestId == null) {
+            guestId = UUID.randomUUID().toString();
+            newGuest = true;
+        }
 
-        Cart cart = cartRepository.findByUsuarioId(userId)
-                .orElseThrow(() -> new RuntimeException("Carrito no encontrado"));
+        Cart cart = userId != null ?
+                cartRepository.findByUsuarioId(userId)
+                        .orElseThrow(() -> new RuntimeException("Carrito no encontrado")) :
+                cartRepository.findByGuestId(guestId)
+                        .orElseThrow(() -> new RuntimeException("Carrito no encontrado"));
 
         CartItem item = cartItemRepository.findById(itemId)
                 .orElseThrow(() -> new RuntimeException("Item no encontrado"));
@@ -125,8 +201,16 @@ public class CartController {
 
         cartItemRepository.delete(item);
 
-        cart = cartRepository.findByUsuarioId(userId).orElse(cart);
-        return ResponseEntity.ok(cart);
+        if (userId != null) {
+            cart = cartRepository.findByUsuarioId(userId).orElse(cart);
+        } else {
+            cart = cartRepository.findByGuestId(guestId).orElse(cart);
+        }
+        ResponseEntity.BodyBuilder builder = ResponseEntity.ok();
+        if (newGuest) {
+            builder.header("X-Guest-Id", guestId);
+        }
+        return builder.body(cart);
     }
 
     private Long getUserId(String username) {
