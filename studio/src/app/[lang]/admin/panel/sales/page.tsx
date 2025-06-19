@@ -10,7 +10,8 @@ interface AdminSalesPageProps {
   params: any;
 }
 
-export default async function AdminSalesPage({ params: { lang } }: AdminSalesPageProps) {
+export default async function AdminSalesPage({ params }: AdminSalesPageProps) {
+  const { lang } = params;
   const dictionary = await getDictionary(lang);
   // Consolidate texts or ensure ManageSalesContent receives all it needs.
   // For simplicity, passing the salesPage part of dictionary, ManageSalesContent can use it.

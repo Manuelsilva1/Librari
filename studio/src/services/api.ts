@@ -5,7 +5,10 @@ import type { Book, Category, Editorial, User, Cart, Sale, Offer, CreateSalePayl
 // Import mock functions
 import * as mockApi from '@/lib/mock-data';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+// Fallback to empty string so fetch uses a relative URL when the env variable
+// is not defined. This avoids runtime errors like `API call failed: {}` when
+// `NEXT_PUBLIC_API_BASE_URL` is missing during local development.
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || '';
 // Correctly use the environment variable or default to 'production'
 const API_MODE = process.env.NEXT_PUBLIC_API_MODE || 'production'; 
 
