@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useCallback } from 'react'; // Added useCallback
+import React, { useState, useEffect, useCallback, use } from 'react'; // Added useCallback
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import type { Category, ApiResponseError } from '@/types'; // Added ApiResponseError
 // Import actual API service functions
@@ -17,7 +17,7 @@ import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface ManageCategoriesContentProps {
-  params: { lang: string }; // lang is now string, not string | undefined
+  params: { lang: string } | Promise<{ lang: string }>; // lang is now string, not string | undefined
   initialCategories: Category[];
   texts: any; // Dictionary texts for categories
 }
@@ -28,7 +28,7 @@ export function ManageCategoriesContent({ params, initialCategories, texts }: Ma
   const searchParams = useSearchParams();
   const { toast } = useToast();
 
-  const lang = params.lang; // Directly use lang from params
+  const { lang } = use(params); // Unwrap params
 
   const action = searchParams.get('action');
   const categoryId = searchParams.get('id');

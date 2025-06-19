@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, use } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import type { Offer, ApiResponseError, Book } from '@/types';
 import { 
@@ -17,7 +17,7 @@ import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface ManageOffersContentProps {
-  params: { lang: string };
+  params: { lang: string } | Promise<{ lang: string }>;
   // initialOffers: Offer[]; // If passing server-fetched initial data
   texts: any; // Dictionary texts for offers
 }
@@ -26,7 +26,7 @@ export function ManageOffersContent({ params, texts }: ManageOffersContentProps)
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
-  const lang = params.lang;
+  const { lang } = use(params);
 
   const action = searchParams.get('action');
   const offerId = searchParams.get('id');
