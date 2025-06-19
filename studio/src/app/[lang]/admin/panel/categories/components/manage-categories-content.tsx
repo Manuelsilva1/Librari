@@ -18,11 +18,11 @@ import { useToast } from '@/hooks/use-toast';
 
 interface ManageCategoriesContentProps {
   params: { lang: string } | Promise<{ lang: string }>; // lang is now string, not string | undefined
-  initialCategories: Category[];
+  initialCategories?: Category[];
   texts: any; // Dictionary texts for categories
 }
 
-export function ManageCategoriesContent({ params, initialCategories, texts }: ManageCategoriesContentProps) {
+export function ManageCategoriesContent({ params, initialCategories = [], texts }: ManageCategoriesContentProps) {
   const router = useRouter();
   const pathname = usePathname(); // Retained for potential future use, but lang is primary
   const searchParams = useSearchParams();
@@ -152,7 +152,7 @@ export function ManageCategoriesContent({ params, initialCategories, texts }: Ma
 
   // Default to list view
   return <CategoryListClient
-            initialCategories={categories}
+            categories={categories}
             onDeleteCategory={handleDeleteCategory}
             lang={lang}
             texts={texts}
