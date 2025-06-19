@@ -19,6 +19,8 @@ public class Cart {
 
     private Long usuarioId;
 
+    private String guestId;
+
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> items;
 }
