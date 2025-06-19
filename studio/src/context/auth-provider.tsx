@@ -22,6 +22,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       setToken(storedToken);
       setUser(JSON.parse(storedUser));
+      // Ensure the auth token is also available as a cookie for the middleware
+      document.cookie = `authToken=${storedToken}; path=/; max-age=${60 * 60 * 24 * 7}`;
     } catch (err) {
       console.warn('authUser corrupto, se limpia →', err);
       localStorage.removeItem('authToken');
@@ -34,6 +36,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = (newToken: string, userData: any) => {
     localStorage.setItem('authToken', newToken);
     localStorage.setItem('authUser', JSON.stringify(userData));
+    document.cookie = `authToken=${newToken}; path=/; max-age=${60 * 60 * 24 * 7}`;
     setToken(newToken);
     setUser(userData);
   };
@@ -41,6 +44,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('authUser');
+    document.cookie = 'authToken=; path=/; max-age=0';
     setToken(null);
     setUser(null);
   };
