@@ -1,7 +1,7 @@
 
 "use client"; 
 
-import { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, use } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import type { Book } from '@/types';
 import { BookFormClient } from './components/book-form-client';
@@ -14,10 +14,11 @@ import { useToast } from '@/hooks/use-toast';
 // Removed mock data and functions
 
 interface ManageBooksContentProps {
-  params: { lang: string };
+  params: { lang: string } | Promise<{ lang: string }>;
 }
 
-function ManageBooksContent({ params: { lang } }: ManageBooksContentProps) {
+function ManageBooksContent({ params }: ManageBooksContentProps) {
+  const { lang } = use(params);
   const searchParams = useSearchParams();
   const router = useRouter();
   const { toast } = useToast();
