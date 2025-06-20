@@ -24,7 +24,7 @@ async function getAdminBookById(id: string): Promise<Book | undefined> {
   return new Promise(resolve => setTimeout(() => resolve(adminMockBooks.find(b => b.id === id)), 100));
 }
 
-async function saveAdminBook(bookData: Book): Promise<void> {
+async function saveAdminBook(bookData: Book & { coverImageFile?: File }): Promise<void> {
   return new Promise(resolve => {
     setTimeout(() => {
       const index = adminMockBooks.findIndex(b => b.id === bookData.id);

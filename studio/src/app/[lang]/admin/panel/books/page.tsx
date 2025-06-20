@@ -72,7 +72,7 @@ function ManageBooksContent({ params }: ManageBooksContentProps) {
     loadEditingBook();
   }, [action, bookId, lang, router, toast]);
 
-  const handleSaveBook = async (bookData: Partial<Book>) => { // Use Partial<Book> for payload
+  const handleSaveBook = async (bookData: Partial<Book> & { coverImageFile?: File }) => {
     setIsFormLoading(true);
     try {
       if (bookData.id) { // Existing book ID means update
