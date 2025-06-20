@@ -34,15 +34,16 @@ const bookSchema = z.object({
   editorialId: z.string().optional().nullable(), // Can be null or empty string for 'No Publisher'
   categoriaId: z.string({ required_error: "Category is required." }).min(1,"Category is required."), // Category is required
   descripcion: z.string().min(10, "Description must be at least 10 characters").max(2000, "Description too long").optional().nullable(),
-  coverImage: z.string().url("Must be a valid URL for cover image (e.g., https://placehold.co/...)").optional().nullable(),
+  coverImage: z.string().optional().nullable(),
+  coverImageFile: z.any().optional(),
   // Removed: genre, targetAudience, themes, content, publishedYear as they are not in the core API Book type (as per types/index.ts)
 });
 
 type BookFormData = z.infer<typeof bookSchema>;
 
 interface BookFormClientProps {
-  book?: Book; // This is the API Book type
-  onSave: (data: Partial<Book>) => Promise<void>; // Data for save can be Partial<Book>
+  book?: Book;
+  onSave: (data: Partial<Book> & { coverImageFile?: File }) => Promise<void>;
   // onDelete is removed as parent page's ManageBooksContent will handle delete button visibility and action if needed.
   // For this refactor, we assume parent handles delete.
   lang: string; 
@@ -90,7 +91,8 @@ export function BookFormClient({ book, onSave, lang, isLoadingExternally }: Book
       editorialId: book.editorialId || null, // Use null for empty Select value if appropriate
       categoriaId: book.categoriaId ? String(book.categoriaId) : '', // Ensure string for Select
       descripcion: book.descripcion || '',
-      coverImage: book.coverImage || 'https://placehold.co/300x450.png',
+      coverImage: book.coverImage || '',
+      coverImageFile: undefined,
     } : {
       // Default values for a new book form
       titulo: '',
@@ -101,7 +103,8 @@ export function BookFormClient({ book, onSave, lang, isLoadingExternally }: Book
       editorialId: null, // Default to null for Select
       categoriaId: '',   // Default to empty string for Select
       descripcion: '',
-      coverImage: 'https://placehold.co/300x450.png',
+      coverImage: '',
+      coverImageFile: undefined,
     },
   });
   
@@ -117,12 +120,13 @@ export function BookFormClient({ book, onSave, lang, isLoadingExternally }: Book
         editorialId: book.editorialId || null,
         categoriaId: book.categoriaId ? String(book.categoriaId) : '',
         descripcion: book.descripcion || '',
-        coverImage: book.coverImage || 'https://placehold.co/300x450.png',
+        coverImage: book.coverImage || '',
+        coverImageFile: undefined,
       });
     } else {
       // Reset to default for 'new book' form if `book` becomes undefined
       form.reset({
-        titulo: '', autor: '', isbn: '', precio: 0, stock: 0, editorialId: null, categoriaId: '', descripcion: '', coverImage: 'https://placehold.co/300x450.png',
+        titulo: '', autor: '', isbn: '', precio: 0, stock: 0, editorialId: null, categoriaId: '', descripcion: '', coverImage: '', coverImageFile: undefined,
       });
     }
   }, [book, form]);
@@ -131,19 +135,20 @@ export function BookFormClient({ book, onSave, lang, isLoadingExternally }: Book
     setIsSaving(true);
     try {
       // Construct the payload for the API (Partial<Book>)
-      const bookToSave: Partial<Book> = {
-        id: book?.id, // Include ID if it's an update
+      const bookToSave: Partial<Book> & { coverImageFile?: File } = {
+        id: book?.id,
         titulo: formData.titulo,
         autor: formData.autor,
         isbn: formData.isbn || undefined,
         precio: Number(formData.precio),
         stock: Number(formData.stock),
         editorialId: formData.editorialId || undefined,
-        categoriaId: formData.categoriaId, // This is already a string from the form
+        categoriaId: formData.categoriaId,
         descripcion: formData.descripcion || undefined,
         coverImage: formData.coverImage || undefined,
+        coverImageFile: formData.coverImageFile as File | undefined,
       };
-      await onSave(bookToSave); // onSave is passed from parent, handles create/update
+      await onSave(bookToSave);
       toast({
         title: book ? "Book Updated!" : "Book Added!",
         description: `${formData.titulo} has been successfully saved.`, // Use formData.titulo
@@ -281,11 +286,13 @@ export function BookFormClient({ book, onSave, lang, isLoadingExternally }: Book
                   </FormItem>
                 )} />
 
-                <FormField control={form.control} name="coverImage" render={({ field }) => (
+                <FormField control={form.control} name="coverImageFile" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Cover Image URL (Optional)</FormLabel>
-                    <FormControl><Input placeholder="https://placehold.co/300x450.png" {...field} value={field.value ?? ''} /></FormControl>
-                    <FormDescription>Use a placeholder service like placehold.co or a direct image link.</FormDescription>
+                    <FormLabel>Cover Image</FormLabel>
+                    <FormControl>
+                      <Input type="file" accept="image/*" onChange={(e) => field.onChange(e.target.files?.[0])} />
+                    </FormControl>
+                    <FormDescription>Choose an image from your device.</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )} />

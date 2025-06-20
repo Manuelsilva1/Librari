@@ -21,15 +21,21 @@ async function fetchApi<T>(endpoint: string, options: FetchApiOptions = {}): Pro
   const url = `${API_BASE_URL}${endpoint}`;
   const authHeaders = getAuthHeaders();
 
-  const config: RequestInit = {
-    ...options,
-    headers: {
-      ...authHeaders,
-      ...options.headers,
-    },
+  const headers: Record<string, string> = {
+    ...authHeaders,
+    ...(options.headers as Record<string, string> | undefined),
   };
 
-  if (options.body && typeof options.body !== 'string') {
+  const config: RequestInit = {
+    ...options,
+    headers,
+  };
+
+  if (options.body instanceof FormData) {
+    config.body = options.body;
+    // Let the browser set the correct Content-Type for FormData
+  } else if (options.body && typeof options.body !== 'string') {
+    headers['Content-Type'] = 'application/json';
     config.body = JSON.stringify(options.body);
   }
 
@@ -103,19 +109,40 @@ export const getBookById = async (id: string | number): Promise<Book> => {
   return fetchApi<Book>(`/api/books/${id}`);
 };
 
-export const createBook = async (bookData: Partial<Book>): Promise<Book> => {
+export const createBook = async (
+  bookData: Partial<Book> & { coverImageFile?: File }
+): Promise<Book> => {
   if (API_MODE === 'mock') return mockApi.mockCreateBook(bookData);
+  const form = new FormData();
+  Object.entries(bookData).forEach(([key, value]) => {
+    if (key === 'coverImageFile') {
+      if (value) form.append('coverImageFile', value as File);
+    } else if (value !== undefined && value !== null) {
+      form.append(key, String(value));
+    }
+  });
   return fetchApi<Book>('/api/books', {
     method: 'POST',
-    body: bookData,
+    body: form,
   });
 };
 
-export const updateBook = async (id: string | number, bookData: Partial<Book>): Promise<Book> => {
+export const updateBook = async (
+  id: string | number,
+  bookData: Partial<Book> & { coverImageFile?: File }
+): Promise<Book> => {
   if (API_MODE === 'mock') return mockApi.mockUpdateBook(id, bookData);
+  const form = new FormData();
+  Object.entries(bookData).forEach(([key, value]) => {
+    if (key === 'coverImageFile') {
+      if (value) form.append('coverImageFile', value as File);
+    } else if (value !== undefined && value !== null) {
+      form.append(key, String(value));
+    }
+  });
   return fetchApi<Book>(`/api/books/${id}`, {
     method: 'PUT',
-    body: bookData,
+    body: form,
   });
 };
 

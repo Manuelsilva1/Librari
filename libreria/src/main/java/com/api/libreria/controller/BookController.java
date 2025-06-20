@@ -7,13 +7,22 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/books")
 public class BookController {
 
     private final BookRepository bookRepository;
+    @Value("${file.upload-dir}")
+    private String uploadDir;
 
     public BookController(BookRepository bookRepository) {
         this.bookRepository = bookRepository;
@@ -24,9 +33,19 @@ public class BookController {
         return bookRepository.findAll(pageable);
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Book> createBook(@Valid @RequestBody Book request) {
+    public ResponseEntity<Book> createBook(
+            @ModelAttribute Book request,
+            @RequestPart(value = "coverImageFile", required = false) MultipartFile file) throws IOException {
+        if (file != null && !file.isEmpty()) {
+            String fileName = UUID.randomUUID() + "-" + file.getOriginalFilename();
+            Path dir = Paths.get(uploadDir);
+            Files.createDirectories(dir);
+            Path path = dir.resolve(fileName);
+            file.transferTo(path.toFile());
+            request.setCoverImage("/uploads/" + fileName);
+        }
         Book saved = bookRepository.save(request);
         return new ResponseEntity<>(saved, HttpStatus.CREATED);
     }
@@ -39,10 +58,11 @@ public class BookController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Book> updateBook(@PathVariable Long id,
-                                           @Valid @RequestBody Book request) {
+                                           @ModelAttribute Book request,
+                                           @RequestPart(value = "coverImageFile", required = false) MultipartFile file) throws IOException {
         Book existing = bookRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Libro no encontrado"));
 
@@ -53,7 +73,16 @@ public class BookController {
         existing.setPrecio(request.getPrecio());
         existing.setStock(request.getStock());
         existing.setDescripcion(request.getDescripcion());
-        existing.setCoverImage(request.getCoverImage());
+        if (file != null && !file.isEmpty()) {
+            String fileName = UUID.randomUUID() + "-" + file.getOriginalFilename();
+            Path dir = Paths.get(uploadDir);
+            Files.createDirectories(dir);
+            Path path = dir.resolve(fileName);
+            file.transferTo(path.toFile());
+            existing.setCoverImage("/uploads/" + fileName);
+        } else {
+            existing.setCoverImage(request.getCoverImage());
+        }
 
         Book updated = bookRepository.save(existing);
         return ResponseEntity.ok(updated);

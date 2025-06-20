@@ -22,7 +22,8 @@ const bookSchema = z.object({
   author: z.string().min(3, "Author name must be at least 3 characters"),
   genre: z.string().min(2, "Genre is required"),
   description: z.string().min(10, "Description must be at least 10 characters").max(1000, "Description too long"),
-  coverImage: z.string().url("Must be a valid URL for cover image (e.g., https://placehold.co/...)"),
+  coverImage: z.string().optional().nullable(),
+  coverImageFile: z.any().optional(),
   price: z.preprocess(
     (val) => parseFloat(String(val)),
     z.number().min(0, "Price cannot be negative")
@@ -44,9 +45,9 @@ const bookSchema = z.object({
 type BookFormData = z.infer<typeof bookSchema>;
 
 interface BookFormClientProps {
-  book?: Book; // Optional: if provided, it's an edit form
-  onSave: (data: Book) => Promise<void>; // Mock save
-  onDelete?: (bookId: string) => Promise<void>; // Mock delete
+  book?: Book;
+  onSave: (data: Book & { coverImageFile?: File }) => Promise<void>;
+  onDelete?: (bookId: string) => Promise<void>;
 }
 
 export function BookFormClient({ book, onSave, onDelete }: BookFormClientProps) {
@@ -68,7 +69,8 @@ export function BookFormClient({ book, onSave, onDelete }: BookFormClientProps) 
       author: '',
       genre: '',
       description: '',
-      coverImage: 'https://placehold.co/300x450.png',
+      coverImage: '',
+      coverImageFile: undefined,
       price: 0,
       stock: 0,
       targetAudience: '',
@@ -87,6 +89,7 @@ export function BookFormClient({ book, onSave, onDelete }: BookFormClientProps) 
         stock: book.stock ?? 0,
         themes: book.themes?.join(', ') ?? '',
         publishedYear: book.publishedYear ?? undefined,
+        coverImageFile: undefined,
       });
     }
   }, [book, form]);
@@ -98,13 +101,14 @@ export function BookFormClient({ book, onSave, onDelete }: BookFormClientProps) 
     setIsSaving(true);
     try {
       const themesArray = typeof data.themes === 'string' ? data.themes.split(',').map(t => t.trim()).filter(t => t) : data.themes;
-      const bookToSave: Book = {
-        id: book?.id || String(Date.now()), // Create new ID if not editing
+      const bookToSave: Book & { coverImageFile?: File } = {
+        id: book?.id || String(Date.now()),
         ...data,
         themes: themesArray,
         price: Number(data.price),
         stock: Number(data.stock),
         publishedYear: data.publishedYear ? Number(data.publishedYear) : undefined,
+        coverImageFile: data.coverImageFile as File | undefined,
       };
       await onSave(bookToSave);
       toast({
@@ -205,11 +209,13 @@ export function BookFormClient({ book, onSave, onDelete }: BookFormClientProps) 
                 <FormMessage />
               </FormItem>
             )} />
-            <FormField control={form.control} name="coverImage" render={({ field }) => (
+            <FormField control={form.control} name="coverImageFile" render={({ field }) => (
               <FormItem>
-                <FormLabel>Cover Image URL</FormLabel>
-                <FormControl><Input placeholder="https://placehold.co/300x450.png" {...field} /></FormControl>
-                <FormDescription>Use a placeholder service like placehold.co or a direct image link.</FormDescription>
+                <FormLabel>Cover Image</FormLabel>
+                <FormControl>
+                  <Input type="file" accept="image/*" onChange={(e) => field.onChange(e.target.files?.[0])} />
+                </FormControl>
+                <FormDescription>Choose an image from your device.</FormDescription>
                 <FormMessage />
               </FormItem>
             )} />
