@@ -51,4 +51,9 @@ public class AuthController {
         User user = userRepository.findByEmail(request.getEmail()).orElseThrow();
         return ResponseEntity.ok(new LoginResponse(token, user));
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout() {
+        return ResponseEntity.ok("Logged out");
+    }
 }

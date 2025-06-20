@@ -49,6 +49,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
   };
 
+  useEffect(() => {
+    const handleLogout = () => logout();
+    window.addEventListener('logout', handleLogout);
+    return () => window.removeEventListener('logout', handleLogout);
+  }, []);
+
   const isAuthenticated = !!token;
 
   return (

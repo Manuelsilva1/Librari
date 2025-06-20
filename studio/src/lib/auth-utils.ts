@@ -9,3 +9,9 @@ export const getAuthHeaders = (): Record<string, string> => {
 
   return headers;
 };
+
+export const dispatchLogoutEvent = (): void => {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('logout'));
+  }
+};

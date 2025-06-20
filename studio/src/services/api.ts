@@ -1,5 +1,5 @@
 
-import { getAuthHeaders } from '@/lib/auth-utils';
+import { getAuthHeaders, dispatchLogoutEvent } from '@/lib/auth-utils';
 import type { Book, Category, Editorial, User, Cart, Sale, Offer, CreateSalePayload, CreateOfferPayload, ApiResponseError } from '@/types'; // Ensure all necessary types are imported
 
 // Import mock functions
@@ -41,6 +41,10 @@ async function fetchApi<T>(endpoint: string, options: FetchApiOptions = {}): Pro
 
   try {
     const response = await fetch(url, config);
+
+    if (response.status === 401) {
+      dispatchLogoutEvent();
+    }
 
     if (!response.ok) {
       let errorData;
