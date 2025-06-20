@@ -3,6 +3,7 @@ package com.api.libreria.controller;
 import com.api.libreria.model.Venta;
 import com.api.libreria.repository.UserRepository;
 import com.api.libreria.repository.VentaRepository;
+import com.api.libreria.dto.CreateSaleRequest;
 import com.api.libreria.service.VentaService;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -34,6 +35,14 @@ public class VentaController {
                                           @RequestParam String metodoPago) {
         Long userId = getUserId(userDetails.getUsername());
         Venta venta = ventaService.crearVentaDesdeCarrito(userId, metodoPago);
+        return ResponseEntity.ok(venta);
+    }
+
+    @PostMapping
+    public ResponseEntity<Venta> crearVenta(@AuthenticationPrincipal UserDetails userDetails,
+                                            @RequestBody CreateSaleRequest request) {
+        Long userId = getUserId(userDetails.getUsername());
+        Venta venta = ventaService.crearVentaDesdeCarrito(userId, request.getPaymentMethod());
         return ResponseEntity.ok(venta);
     }
 

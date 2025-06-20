@@ -2,6 +2,8 @@ package com.api.libreria.controller;
 
 import com.api.libreria.model.*;
 import com.api.libreria.repository.*;
+import com.api.libreria.dto.AddToCartRequest;
+import com.api.libreria.dto.UpdateCartItemRequest;
 import org.springframework.http.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -69,8 +71,10 @@ public class CartController {
     @PostMapping("/add")
     public ResponseEntity<Cart> addToCart(@AuthenticationPrincipal UserDetails userDetails,
             @RequestParam(required = false) String guestId,
-            @RequestParam Long bookId,
-            @RequestParam Integer cantidad) {
+            @RequestBody AddToCartRequest request) {
+
+        Long bookId = request.getLibroId();
+        Integer cantidad = request.getCantidad();
 
         Long userId = null;
         boolean newGuest = false;
@@ -134,7 +138,9 @@ public class CartController {
     public ResponseEntity<Cart> updateItemQuantity(@AuthenticationPrincipal UserDetails userDetails,
             @RequestParam(required = false) String guestId,
             @PathVariable Long itemId,
-            @RequestParam Integer cantidad) {
+            @RequestBody UpdateCartItemRequest request) {
+
+        Integer cantidad = request.getCantidad();
         Long userId = null;
         boolean newGuest = false;
         if (userDetails != null) {
