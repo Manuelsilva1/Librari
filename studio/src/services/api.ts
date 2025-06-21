@@ -196,9 +196,18 @@ export const deleteCategory = async (id: string | number): Promise<void> => {
 };
 
 // --- Editorials ---
-export const getEditorials = async (): Promise<Editorial[]> => {
+export const getEditorials = async (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  params: Record<string, any> = {},
+): Promise<Editorial[]> => {
   if (API_MODE === 'mock') return mockApi.mockGetEditorials();
-  return fetchApi<Editorial[]>('/api/editoriales');
+
+  const query = new URLSearchParams(params).toString();
+  const page: Page<Editorial> = await fetchApi<Page<Editorial>>(
+    `/api/editoriales${query ? '?' + query : ''}`,
+  );
+
+  return page.content;
 };
 
 export const createEditorial = async (editorialData: Partial<Editorial>): Promise<Editorial> => {
