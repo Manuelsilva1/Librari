@@ -170,7 +170,7 @@ export function PosClient({ lang, dictionary, allBooks, posTexts }: PosClientPro
                   {searchResults.map(book => (
                     <li key={book.id} className="flex items-center justify-between p-2 hover:bg-accent rounded-md">
                       <div className="flex items-center space-x-2 overflow-hidden">
-                        <Image src={book.coverImage || '/placeholder-image.png'} alt={book.titulo} width={30} height={45} className="rounded object-cover" data-ai-hint="book cover search"/>
+                        <Image src={book.coverImage ? `${process.env.NEXT_PUBLIC_API_BASE_URL || ''}${book.coverImage}` : '/placeholder-image.png'} alt={book.titulo} width={30} height={45} className="rounded object-cover" data-ai-hint="book cover search"/>
                         <div className="flex-grow overflow-hidden">
                           <p className="text-sm font-medium truncate" title={book.titulo}>{book.titulo}</p> 
                           <p className="text-xs text-muted-foreground truncate" title={book.autor}>{book.autor}</p>
@@ -214,7 +214,7 @@ export function PosClient({ lang, dictionary, allBooks, posTexts }: PosClientPro
                     {currentOrderItems.map(item => (
                       <TableRow key={item.book.id}>
                         <TableCell className="flex items-center space-x-2">
-                        <Image src={item.book.coverImage || '/placeholder-image.png'} alt={item.book.titulo} width={40} height={60} className="rounded object-cover" data-ai-hint="book cover order"/>
+                        <Image src={item.book.coverImage ? `${process.env.NEXT_PUBLIC_API_BASE_URL || ''}${item.book.coverImage}` : '/placeholder-image.png'} alt={item.book.titulo} width={40} height={60} className="rounded object-cover" data-ai-hint="book cover order"/>
                           <div>
                           <p className="font-medium truncate w-32" title={item.book.titulo}>{item.book.titulo}</p> 
                           <p className="text-xs text-muted-foreground truncate w-32" title={item.book.autor}>{item.book.autor}</p> 

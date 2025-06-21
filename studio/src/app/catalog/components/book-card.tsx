@@ -17,6 +17,9 @@ export function BookCard({ book }: BookCardProps) {
   const { addToCart } = useCart();
   const { toast } = useToast();
 
+  const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+  const imageSrc = book.coverImage ? `${apiBase}${book.coverImage}` : 'https://placehold.co/300x450.png';
+
   const handleAddToCart = () => {
     addToCart(book);
     toast({
@@ -30,7 +33,7 @@ export function BookCard({ book }: BookCardProps) {
       <CardHeader className="p-0">
         <Link href={`/books/${book.id}`} className="block">
           <Image
-            src={book.coverImage}
+            src={imageSrc}
             alt={book.title}
             width={300}
             height={450}

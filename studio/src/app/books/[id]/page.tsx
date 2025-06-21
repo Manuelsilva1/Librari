@@ -83,7 +83,7 @@ export default async function BookDetailPage({ params }: { params: { id: string 
           <div className="grid md:grid-cols-2 gap-8 lg:gap-12 items-start">
             <div>
               <LightboxClient
-                src={book.coverImage || '/placeholder-image.png'} // Use API field
+                src={book.coverImage ? `${process.env.NEXT_PUBLIC_API_BASE_URL || ''}${book.coverImage}` : '/placeholder-image.png'}
                 alt={book.titulo || 'Book cover'} // Use API field
                 width={600}
                 height={900}

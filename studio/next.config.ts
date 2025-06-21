@@ -22,6 +22,19 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      ...(process.env.NEXT_PUBLIC_API_BASE_URL
+        ? (() => {
+            const url = new URL(process.env.NEXT_PUBLIC_API_BASE_URL as string);
+            return [
+              {
+                protocol: url.protocol.replace(':', ''),
+                hostname: url.hostname,
+                port: url.port,
+                pathname: '/**',
+              },
+            ];
+          })()
+        : []),
     ],
   },
   // The i18n object below is for the Pages Router and conflicts with

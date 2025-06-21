@@ -98,7 +98,7 @@ export function BookListClient({ initialBooks, onDeleteBook }: BookListClientPro
                 <TableRow key={book.id}>
                   <TableCell>
                     <Image
-                      src={book.coverImage}
+                      src={book.coverImage ? `${process.env.NEXT_PUBLIC_API_BASE_URL || ''}${book.coverImage}` : '/placeholder-image.png'}
                       alt={book.title}
                       width={50}
                       height={75}

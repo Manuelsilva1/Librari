@@ -20,6 +20,9 @@ export function BookCard({ book, lang, dictionary }: BookCardProps) {
   const { addItem } = useCart();
   const { toast } = useToast();
 
+  const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+  const imageSrc = book.coverImage ? `${apiBase}${book.coverImage}` : 'https://placehold.co/300x450.png';
+
   // Robust check for the book object itself and its id
   if (!book || typeof book !== 'object' || !book.id) {
     console.error("BookCard received invalid book data or book without ID:", book);
@@ -52,7 +55,7 @@ export function BookCard({ book, lang, dictionary }: BookCardProps) {
       <CardHeader className="p-0">
         <Link href={`/${lang}/books/${book.id}`} className="block">
           <Image
-            src={book.coverImage || 'https://placehold.co/300x450.png'}
+            src={imageSrc}
             alt={bookTitle}
             width={300}
             height={450}
