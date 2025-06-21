@@ -10,6 +10,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -70,6 +72,25 @@ public class BookController {
         return bookRepository.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{id}/cover")
+    public ResponseEntity<Resource> getBookCover(@PathVariable Long id) throws IOException {
+        Book book = bookRepository.findById(id).orElse(null);
+        if (book == null || book.getCoverImage() == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Path filePath = Paths.get(uploadDir).resolve(Paths.get(book.getCoverImage()).getFileName());
+        if (!Files.exists(filePath)) {
+            return ResponseEntity.notFound().build();
+        }
+        Resource resource = new UrlResource(filePath.toUri());
+        String contentType = Files.probeContentType(filePath);
+        MediaType mediaType = contentType != null ? MediaType.parseMediaType(contentType) : MediaType.APPLICATION_OCTET_STREAM;
+        return ResponseEntity.ok()
+                .contentType(mediaType)
+                .body(resource);
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

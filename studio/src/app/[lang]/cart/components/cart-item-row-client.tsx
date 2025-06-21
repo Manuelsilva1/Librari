@@ -65,7 +65,7 @@ export function CartItemRowClient({ item, lang, dictionary }: CartItemRowClientP
       <div className="flex items-center space-x-4 mb-4 sm:mb-0">
         <Link href={`/${lang}/books/${bookDetails.id}`}>
           <Image
-            src={bookDetails.coverImage || '/placeholder-image.png'} // Fallback image
+            src={bookDetails.coverImage ? `${process.env.NEXT_PUBLIC_API_BASE_URL || ''}${bookDetails.coverImage}` : '/placeholder-image.png'}
             alt={bookDetails.titulo}
             width={80}
             height={120}
