@@ -47,17 +47,18 @@ export function Header({ lang, dictionary }: HeaderProps) {
               )*/}
             </Button>
           </Link>
-          {isAuthenticated ? (
-            <UserMenu lang={lang} dictionary={dictionary} />
-          ) : (
+          
             <ThemeToggle />
-          )}
+         
           <LanguageSwitcher dictionary={dictionary} />
           <Button asChild variant="ghost" size="icon">
             <Link href={`/${lang}/admin`} aria-label={dictionary.header.admin}>
               <Settings className="h-5 w-5" />
             </Link>
           </Button>
+          {isAuthenticated ? (
+            <UserMenu lang={lang} dictionary={dictionary} />
+          ) : (null)}
         </nav>
       </div>
     </header>
