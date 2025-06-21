@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
+import { ImageWithFallback } from '@/components/image-with-fallback';
 import { getCoverImageUrl } from '@/lib/utils';
 import Link from 'next/link';
 import type { Book } from '@/types';
@@ -102,15 +102,12 @@ export function BookListClient({ books, onDeleteBook, lang }: BookListClientProp
               {filteredBooks.map((book) => (
                 <TableRow key={book.id}>
                   <TableCell>
-                    <Image
+                    <ImageWithFallback
                       src={getCoverImageUrl(book.coverImage)}
                       alt={book.titulo}
                       width={50}
                       height={75}
                       className="rounded object-cover"
-                      onError={(e) => {
-                        e.currentTarget.src = 'https://placehold.co/600x900?text=No+Image';
-                      }}
                     />
                   </TableCell>
                   <TableCell className="font-medium">{book.titulo}</TableCell>

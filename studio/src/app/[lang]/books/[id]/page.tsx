@@ -91,7 +91,7 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
         <div className="grid md:grid-cols-2 gap-8 lg:gap-12 items-start">
           <div>
             <LightboxClient
-              src={getCoverImageUrl(book.coverImage, 'https://placehold.co/600x900.png')}
+              src={getCoverImageUrl(book.coverImage, 'https://placehold.co/600x900.png?text=Sin+imagen')}
               alt={book.titulo || "Book cover"}
               width={600}
               height={900}

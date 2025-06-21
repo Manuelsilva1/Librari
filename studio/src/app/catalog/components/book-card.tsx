@@ -1,6 +1,6 @@
 "use client";
 
-import Image from 'next/image';
+import { ImageWithFallback } from '@/components/image-with-fallback';
 import { getCoverImageUrl } from '@/lib/utils';
 import Link from 'next/link';
 import type { Book } from '@/types';
@@ -18,7 +18,7 @@ export function BookCard({ book }: BookCardProps) {
   const { addToCart } = useCart();
   const { toast } = useToast();
 
-  const imageSrc = getCoverImageUrl(book.coverImage, 'https://placehold.co/300x450.png');
+  const imageSrc = getCoverImageUrl(book.coverImage, 'https://placehold.co/300x450.png?text=Sin+imagen');
 
   const handleAddToCart = () => {
     addToCart(book);
@@ -32,15 +32,12 @@ export function BookCard({ book }: BookCardProps) {
     <Card className="flex flex-col overflow-hidden h-full shadow-md hover:shadow-lg transition-shadow duration-300 rounded-lg">
       <CardHeader className="p-0">
         <Link href={`/books/${book.id}`} className="block">
-          <Image
+          <ImageWithFallback
             src={imageSrc}
             alt={book.title}
             width={300}
             height={450}
             className="w-full h-72 object-cover"
-            onError={(e) => {
-              e.currentTarget.src = 'https://placehold.co/600x900?text=No+Image';
-            }}
             data-ai-hint={`${book.genre} book cover`}
           />
         </Link>

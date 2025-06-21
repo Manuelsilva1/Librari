@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from 'react';
-import Image from 'next/image';
+import { ImageWithFallback } from '@/components/image-with-fallback';
 import { getCoverImageUrl } from '@/lib/utils';
 import type { Book, Sale, CreateSalePayload, CreateSaleItemPayload, ApiResponseError } from '@/types'; // Use API Sale types
 import type { Dictionary } from '@/types'; 
@@ -171,15 +171,12 @@ export function PosClient({ lang, dictionary, allBooks, posTexts }: PosClientPro
                   {searchResults.map(book => (
                     <li key={book.id} className="flex items-center justify-between p-2 hover:bg-accent rounded-md">
                       <div className="flex items-center space-x-2 overflow-hidden">
-                        <Image
+                        <ImageWithFallback
                           src={getCoverImageUrl(book.coverImage)}
                           alt={book.titulo}
                           width={30}
                           height={45}
                           className="rounded object-cover"
-                          onError={(e) => {
-                            e.currentTarget.src = 'https://placehold.co/600x900?text=No+Image';
-                          }}
                           data-ai-hint="book cover search"
                         />
                         <div className="flex-grow overflow-hidden">
@@ -225,15 +222,12 @@ export function PosClient({ lang, dictionary, allBooks, posTexts }: PosClientPro
                     {currentOrderItems.map(item => (
                       <TableRow key={item.book.id}>
                         <TableCell className="flex items-center space-x-2">
-                        <Image
+                        <ImageWithFallback
                           src={getCoverImageUrl(item.book.coverImage)}
                           alt={item.book.titulo}
                           width={40}
                           height={60}
                           className="rounded object-cover"
-                          onError={(e) => {
-                            e.currentTarget.src = 'https://placehold.co/600x900?text=No+Image';
-                          }}
                           data-ai-hint="book cover order"
                         />
                           <div>

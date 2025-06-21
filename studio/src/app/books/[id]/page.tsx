@@ -9,7 +9,7 @@ import { ShoppingCart } from 'lucide-react';
 import { LightboxClient } from './components/lightbox-client'; // This component might not exist or might need /lang/ prefix
 import { CartProvider, useCart } from '@/context/cart-provider'; 
 import type { Book } from '@/types'; // Import Book type
-import Image from 'next/image'; // Import Image
+import { ImageWithFallback } from '@/components/image-with-fallback';
 import { getCoverImageUrl } from '@/lib/utils';
 
 export async function generateStaticParams() {

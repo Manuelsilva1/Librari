@@ -14,7 +14,7 @@ export function cn(...inputs: ClassValue[]) {
  */
 export function getCoverImageUrl(
   coverImage?: string | null,
-  placeholder = 'https://placehold.co/600x900?text=No+Image',
+  placeholder = 'https://placehold.co/600x900?text=Sin+imagen',
 ): string {
   if (!coverImage) return placeholder;
   if (/^https?:\/\//i.test(coverImage)) {
