@@ -1,10 +1,9 @@
-"use client"
+"use client";
 
 import type { ReactNode } from 'react';
-import { createContext, useState, useEffect, useCallback, useContext } from 'react'; // Import useContext
-import type { Book, Cart, CartItem as ApiCartItem, ApiResponseError } from '@/types'; // Renamed CartItem to ApiCartItem to avoid conflict
-import { useAuth } from './auth-provider';
-import { getCart, addItemToCart as apiAddItemToCart, updateCartItem as apiUpdateCartItem, removeCartItem as apiRemoveCartItem } from '@/services/api';
+import { createContext, useState, useEffect, useCallback, useContext } from 'react';
+import type { Book, Cart, CartItem } from '@/types';
+import { getBookById } from '@/services/api';
 
 export interface CartContextType {
   cart: Cart | null;
@@ -26,145 +25,118 @@ interface CartProviderProps {
 }
 
 export function CartProvider({ children }: CartProviderProps) {
-  const { token, isAuthenticated } = useAuth();
+  const LOCAL_STORAGE_KEY = 'localCart';
   const [cart, setCart] = useState<Cart | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchCart = useCallback(async () => {
-    if (!isAuthenticated) {
-      setCart(null); // Clear cart if not authenticated
-      return;
+  const loadCartFromStorage = (): Cart => {
+    if (typeof window === 'undefined') return { items: [] };
+    const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (stored) {
+      try {
+        return JSON.parse(stored) as Cart;
+      } catch (e) {
+        console.warn('Failed to parse cart from storage', e);
+      }
     }
+    return { items: [] };
+  };
+
+  const saveCartToStorage = (cartToSave: Cart) => {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cartToSave));
+  };
+
+  const fetchCart = useCallback(async () => {
     setIsLoading(true);
-    setError(null);
     try {
-      const fetchedCart = await getCart();
-      setCart(fetchedCart);
-    } catch (err) {
-      const apiError = err as ApiResponseError;
-      console.error("Failed to fetch cart:", apiError);
-      setError(apiError.message || "Failed to load cart.");
-      // setCart(null); // Optionally clear cart on error or keep stale data
+      const stored = loadCartFromStorage();
+      setCart(stored);
     } finally {
       setIsLoading(false);
     }
-  }, [isAuthenticated]);
+  }, []);
 
   useEffect(() => {
     fetchCart();
-  }, [fetchCart, token]); // Re-fetch cart when token changes (login/logout)
+  }, [fetchCart]);
+
+  useEffect(() => {
+    if (cart) saveCartToStorage(cart);
+  }, [cart]);
 
   const addItem = async (bookId: string | number, quantity: number = 1) => {
-    if (!isAuthenticated) {
-      setError("User not authenticated. Cannot add item to cart.");
-      // Or redirect to login, or handle local cart for guests
-      return;
-    }
     setIsLoading(true);
     setError(null);
     try {
-      // Assuming bookId is what's needed by API, not the full Book object
-      const updatedCart = await apiAddItemToCart({ libroId: bookId, cantidad: quantity });
-      setCart(updatedCart);
+      const book = await getBookById(bookId);
+      setCart(prev => {
+        const current = prev ?? { items: [] };
+        const existing = current.items.find(i => String(i.libroId) === String(bookId));
+        let newItems: CartItem[];
+        if (existing) {
+          newItems = current.items.map(i =>
+            String(i.libroId) === String(bookId)
+              ? { ...i, cantidad: i.cantidad + quantity }
+              : i,
+          );
+        } else {
+          const newItem: CartItem = {
+            libroId: bookId,
+            cantidad: quantity,
+            precioUnitario: book.precio,
+            libro: book,
+          };
+          newItems = [...current.items, newItem];
+        }
+        const newCart = { ...current, items: newItems };
+        newCart.total = newItems.reduce((t, it) => t + it.precioUnitario * it.cantidad, 0);
+        return newCart;
+      });
     } catch (err) {
-      const apiError = err as ApiResponseError;
-      console.error("Failed to add item to cart:", apiError);
-      setError(apiError.message || "Failed to add item.");
+      setError((err as Error).message);
     } finally {
       setIsLoading(false);
     }
   };
 
   const removeItem = async (itemId: string | number) => {
-    if (!isAuthenticated) {
-      setError("User not authenticated. Cannot remove item from cart.");
-      return;
-    }
-    setIsLoading(true);
-    setError(null);
-    try {
-      await apiRemoveCartItem(itemId);
-      // Option 1: Re-fetch the entire cart
-      await fetchCart();
-      // Option 2: If API returned updated cart (current service returns void)
-      // setCart(updatedCartFromApi);
-      // Option 3: Manipulate local state (less safe if other changes happen concurrently)
-      // setCart(prevCart => ({
-      //   ...prevCart!,
-      //   items: prevCart!.items.filter(item => item.id !== itemId),
-      //   // Recalculate total or wait for API to provide it
-      // }));
-    } catch (err) {
-      const apiError = err as ApiResponseError;
-      console.error("Failed to remove item from cart:", apiError);
-      setError(apiError.message || "Failed to remove item.");
-    } finally {
-      setIsLoading(false);
-    }
+    setCart(prev => {
+      if (!prev) return prev;
+      const newItems = prev.items.filter(i => String(i.libroId) !== String(itemId));
+      const newCart = { ...prev, items: newItems };
+      newCart.total = newItems.reduce((t, it) => t + it.precioUnitario * it.cantidad, 0);
+      return newCart;
+    });
   };
 
   const updateItemQuantity = async (itemId: string | number, newQuantity: number) => {
-    if (!isAuthenticated) {
-      setError("User not authenticated. Cannot update item quantity.");
-      return;
-    }
     if (newQuantity <= 0) {
-      await removeItem(itemId);
+      removeItem(itemId);
       return;
     }
-    setIsLoading(true);
-    setError(null);
-    try {
-      const updatedCart = await apiUpdateCartItem(itemId, { cantidad: newQuantity });
-      setCart(updatedCart);
-    } catch (err) {
-      const apiError = err as ApiResponseError;
-      console.error("Failed to update item quantity:", apiError);
-      setError(apiError.message || "Failed to update quantity.");
-    } finally {
-      setIsLoading(false);
-    }
+    setCart(prev => {
+      if (!prev) return prev;
+      const newItems = prev.items.map(i =>
+        String(i.libroId) === String(itemId) ? { ...i, cantidad: newQuantity } : i,
+      );
+      const newCart = { ...prev, items: newItems };
+      newCart.total = newItems.reduce((t, it) => t + it.precioUnitario * it.cantidad, 0);
+      return newCart;
+    });
   };
 
   const clearCart = async () => {
-    if (!isAuthenticated) {
-      setError("User not authenticated. Cannot clear cart.");
-      return;
-    }
-    // This is tricky without a dedicated API endpoint.
-    // Option 1: Iterate and remove all items (can be slow, many API calls)
-    setIsLoading(true);
-    setError(null);
-    try {
-      if (cart && cart.items.length > 0) {
-        // This is a simplified approach. A robust solution might involve Promise.all
-        // or a batch delete API if available.
-        for (const item of cart.items) {
-          if (item.id) { // Ensure item has an ID
-             await apiRemoveCartItem(item.id);
-          }
-        }
-      }
-      await fetchCart(); // Re-fetch to confirm cart is empty or get latest state
-    } catch (err) {
-      const apiError = err as ApiResponseError;
-      console.error("Failed to clear cart:", apiError);
-      setError(apiError.message || "Failed to clear cart.");
-    } finally {
-      setIsLoading(false);
-    }
-    // Option 2: If no dedicated API, just clear local state and let it re-sync
-    // setCart(null);
-    // This is less ideal as the backend cart would persist.
+    setCart({ items: [], total: 0 });
   };
 
   const getCartTotal = () => {
-    return cart?.total ?? cart?.items?.reduce((total, item) => total + (item.libro?.precio ?? 0) * item.cantidad, 0) ?? 0;
+    return cart?.items.reduce((total, item) => total + item.precioUnitario * item.cantidad, 0) ?? 0;
   };
 
   const getItemCount = () => {
-    return cart?.items?.reduce((count, item) => count + item.cantidad, 0) ?? 0;
+    return cart?.items.reduce((count, item) => count + item.cantidad, 0) ?? 0;
   };
 
   return (
