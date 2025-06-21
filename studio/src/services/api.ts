@@ -158,9 +158,18 @@ export const deleteBook = async (id: string | number): Promise<void> => {
 };
 
 // --- Categories ---
-export const getCategories = async (): Promise<Category[]> => {
+export const getCategories = async (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  params: Record<string, any> = {},
+): Promise<Category[]> => {
   if (API_MODE === 'mock') return mockApi.mockGetCategories();
-  return fetchApi<Category[]>('/api/categorias');
+
+  const query = new URLSearchParams(params).toString();
+  const page: Page<Category> = await fetchApi<Page<Category>>(
+    `/api/categorias${query ? '?' + query : ''}`,
+  );
+
+  return page.content;
 };
 
 export const createCategory = async (categoryData: Partial<Category>): Promise<Category> => {
