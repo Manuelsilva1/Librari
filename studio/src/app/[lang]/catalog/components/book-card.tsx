@@ -2,6 +2,7 @@
 "use client";
 
 import Image from 'next/image';
+import { getCoverImageUrl } from '@/lib/utils';
 import Link from 'next/link';
 import type { Book, Dictionary } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -20,8 +21,7 @@ export function BookCard({ book, lang, dictionary }: BookCardProps) {
   const { addItem } = useCart();
   const { toast } = useToast();
 
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || '';
-  const imageSrc = book.coverImage ? `${apiBase}${book.coverImage}` : 'https://placehold.co/300x450.png';
+  const imageSrc = getCoverImageUrl(book.coverImage, 'https://placehold.co/300x450.png');
 
   // Robust check for the book object itself and its id
   if (!book || typeof book !== 'object' || !book.id) {
@@ -60,6 +60,9 @@ export function BookCard({ book, lang, dictionary }: BookCardProps) {
             width={300}
             height={450}
             className="w-full h-72 object-cover"
+            onError={(e) => {
+              e.currentTarget.src = 'https://placehold.co/600x900?text=No+Image';
+            }}
             data-ai-hint="book cover"
           />
         </Link>
