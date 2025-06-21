@@ -8,7 +8,9 @@
     "cart": "Cart",
     "admin": "Admin",
     "toggleTheme": "Toggle theme",
-    "changeLanguage": "Change language"
+    "changeLanguage": "Change language",
+    "profile": "Profile",
+    "logout": "Logout"
   },
   "footer": {
     "copyright": "© {year} Librería 33. All rights reserved."
