@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
+import org.springframework.boot.system.ApplicationHome;
 
 @RestController
 @RequestMapping("/api/books")
@@ -37,17 +38,30 @@ public class BookController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Book> createBook(
             @ModelAttribute Book request,
-            @RequestPart(value = "coverImageFile", required = false) MultipartFile file) throws IOException {
+            @RequestPart(value = "coverImageFile", required = false) MultipartFile file
+    ) throws IOException {
+
         if (file != null && !file.isEmpty()) {
+
+            /* 1. Carpeta donde vive el .jar (o la clase Main si corres con mvn spring-boot:run) */
+            ApplicationHome home = new ApplicationHome(getClass());
+            Path jarDir = home.getDir().toPath();          // …/mi-app.jar  →  …/
+
+            /* 2. Subcarpeta “uploads” dentro de ese directorio */
+            Path dir = jarDir.resolve("uploads");
+            Files.createDirectories(dir);                  // la crea si no existe
+
+            /* 3. Nombre único y guardado */
             String fileName = UUID.randomUUID() + "-" + file.getOriginalFilename();
-            Path dir = Paths.get(uploadDir);
-            Files.createDirectories(dir);
             Path path = dir.resolve(fileName);
-            file.transferTo(path.toFile());
+            file.transferTo(path);
+
+            /* 4. Guarda la URL relativa para que el frontend la pida luego */
             request.setCoverImage("/uploads/" + fileName);
         }
+
         Book saved = bookRepository.save(request);
-        return new ResponseEntity<>(saved, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
     @GetMapping("/{id}")
@@ -61,8 +75,8 @@ public class BookController {
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Book> updateBook(@PathVariable Long id,
-                                           @ModelAttribute Book request,
-                                           @RequestPart(value = "coverImageFile", required = false) MultipartFile file) throws IOException {
+            @ModelAttribute Book request,
+            @RequestPart(value = "coverImageFile", required = false) MultipartFile file) throws IOException {
         Book existing = bookRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Libro no encontrado"));
 
