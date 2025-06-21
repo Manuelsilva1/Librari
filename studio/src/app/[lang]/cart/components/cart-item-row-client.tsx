@@ -2,6 +2,7 @@
 "use client";
 
 import Image from 'next/image';
+import { getCoverImageUrl } from '@/lib/utils';
 import Link from 'next/link';
 // Ensure CartItem is the one from '@/types' that matches API structure
 import type { CartItem as ApiCartItem, Dictionary } from '@/types'; 
@@ -65,11 +66,14 @@ export function CartItemRowClient({ item, lang, dictionary }: CartItemRowClientP
       <div className="flex items-center space-x-4 mb-4 sm:mb-0">
         <Link href={`/${lang}/books/${bookDetails.id}`}>
           <Image
-            src={bookDetails.coverImage ? `${process.env.NEXT_PUBLIC_API_BASE_URL || ''}${bookDetails.coverImage}` : '/placeholder-image.png'}
+            src={getCoverImageUrl(bookDetails.coverImage)}
             alt={bookDetails.titulo}
             width={80}
             height={120}
             className="rounded-md object-cover border"
+            onError={(e) => {
+              e.currentTarget.src = 'https://placehold.co/600x900?text=No+Image';
+            }}
           />
         </Link>
         <div>

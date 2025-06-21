@@ -10,6 +10,7 @@ import { LightboxClient } from './components/lightbox-client'; // This component
 import { CartProvider, useCart } from '@/context/cart-provider'; 
 import type { Book } from '@/types'; // Import Book type
 import Image from 'next/image'; // Import Image
+import { getCoverImageUrl } from '@/lib/utils';
 
 export async function generateStaticParams() {
   // This function would need to fetch actual book IDs from the API if this page were to be kept.
@@ -83,7 +84,7 @@ export default async function BookDetailPage({ params }: { params: { id: string 
           <div className="grid md:grid-cols-2 gap-8 lg:gap-12 items-start">
             <div>
               <LightboxClient
-                src={book.coverImage ? `${process.env.NEXT_PUBLIC_API_BASE_URL || ''}${book.coverImage}` : '/placeholder-image.png'}
+                src={getCoverImageUrl(book.coverImage)}
                 alt={book.titulo || 'Book cover'} // Use API field
                 width={600}
                 height={900}

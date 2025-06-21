@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { getCoverImageUrl } from '@/lib/utils';
 import Link from 'next/link';
 import type { Book } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -98,11 +99,14 @@ export function BookListClient({ initialBooks, onDeleteBook }: BookListClientPro
                 <TableRow key={book.id}>
                   <TableCell>
                     <Image
-                      src={book.coverImage ? `${process.env.NEXT_PUBLIC_API_BASE_URL || ''}${book.coverImage}` : '/placeholder-image.png'}
+                      src={getCoverImageUrl(book.coverImage)}
                       alt={book.title}
                       width={50}
                       height={75}
                       className="rounded object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = 'https://placehold.co/600x900?text=No+Image';
+                      }}
                       data-ai-hint="book cover admin"
                     />
                   </TableCell>
