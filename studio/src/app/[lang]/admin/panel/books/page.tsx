@@ -119,7 +119,7 @@ function ManageBooksContent({ params }: ManageBooksContentProps) {
     return <BookFormClient key={keyForForm} book={editingBook} onSave={handleSaveBook} onDelete={handleDeleteBook} lang={lang} />;
   }
 
-  return <BookListClient initialBooks={books} onDeleteBook={handleDeleteBook} lang={lang} />;
+  return <BookListClient books={books} onDeleteBook={handleDeleteBook} lang={lang} />;
 }
 
 interface ManageBooksPageProps {
