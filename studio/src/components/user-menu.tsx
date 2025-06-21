@@ -39,7 +39,9 @@ export function UserMenu({ lang, dictionary }: UserMenuProps) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem asChild>
-          <Link href={`/${lang}/profile`}>{dictionary.header.profile ?? "Profile"}</Link>
+          <Link href={`/${lang}/admin/panel`}>
+            {dictionary.adminPanel?.footer?.text ?? "Admin Panel"}
+          </Link>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={logout}>
           {dictionary.header.logout ?? "Logout"}
