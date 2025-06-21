@@ -17,12 +17,12 @@ import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast'; // Added useToast
 
 interface ManageEditorialsContentProps {
-  params: { lang: string } | Promise<{ lang: string }>; // Changed lang to be a required string
-  initialEditorials: Editorial[];
+  params: { lang: string } | Promise<{ lang: string }>;
+  initialEditorials?: Editorial[];
   texts: any;
 }
 
-export function ManageEditorialsContent({ params, initialEditorials, texts }: ManageEditorialsContentProps) {
+export function ManageEditorialsContent({ params, initialEditorials = [], texts }: ManageEditorialsContentProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast(); // Initialized useToast
@@ -143,10 +143,12 @@ export function ManageEditorialsContent({ params, initialEditorials, texts }: Ma
   }
 
   // Default to list view
-  return <EditorialListClient
-            initialEditorials={editorials} // Pass the current state of editorials
-            onDeleteEditorial={handleDeleteEditorial}
-            lang={lang}
-            texts={texts}
-          />;
+  return (
+    <EditorialListClient
+      editorials={editorials}
+      onDeleteEditorial={handleDeleteEditorial}
+      lang={lang}
+      texts={texts}
+    />
+  );
 }
