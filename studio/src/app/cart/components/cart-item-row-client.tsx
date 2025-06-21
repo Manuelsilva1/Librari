@@ -1,6 +1,6 @@
 "use client";
 
-import Image from 'next/image';
+import { ImageWithFallback } from '@/components/image-with-fallback';
 import Link from 'next/link';
 import type { CartItem } from '@/types';
 import { useCart } from '@/hooks/use-cart';
@@ -23,7 +23,7 @@ export function CartItemRowClient({ item }: CartItemRowClientProps) {
     <div className="flex flex-col sm:flex-row items-center justify-between py-4 border-b last:border-b-0">
       <div className="flex items-center space-x-4 mb-4 sm:mb-0">
         <Link href={`/books/${item.book.id}`}>
-          <Image
+          <ImageWithFallback
             src={item.book.coverImage}
             alt={item.book.title}
             width={80}

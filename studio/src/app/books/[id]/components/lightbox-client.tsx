@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import Image from 'next/image';
+import { ImageWithFallback } from '@/components/image-with-fallback';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { X } from 'lucide-react';
 
@@ -20,22 +20,22 @@ export function LightboxClient({ src, alt, width, height, triggerClassName }: Li
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <div className={`cursor-zoom-in relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow ${triggerClassName}`}>
-          <Image
+          <ImageWithFallback
             src={src}
             alt={alt}
             width={width}
             height={height}
             className="w-full h-auto object-contain"
-            priority 
+            priority
           />
         </div>
       </DialogTrigger>
       <DialogContent className="max-w-3xl p-2 bg-transparent border-none shadow-none !rounded-none">
         <div className="relative">
-           <Image
+           <ImageWithFallback
             src={src}
             alt={alt}
-            width={1200} 
+            width={1200}
             height={1800}
             className="w-full h-auto max-h-[90vh] object-contain rounded-md"
           />
