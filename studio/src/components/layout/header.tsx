@@ -51,14 +51,15 @@ export function Header({ lang, dictionary }: HeaderProps) {
             <ThemeToggle />
          
           <LanguageSwitcher dictionary={dictionary} />
-          <Button asChild variant="ghost" size="icon">
-            <Link href={`/${lang}/admin`} aria-label={dictionary.header.admin}>
-              <Settings className="h-5 w-5" />
-            </Link>
-          </Button>
           {isAuthenticated ? (
             <UserMenu lang={lang} dictionary={dictionary} />
-          ) : (null)}
+          ) : (
+            <Button asChild variant="ghost" size="icon">
+              <Link href={`/${lang}/admin`} aria-label={dictionary.header.admin}>
+                <Settings className="h-5 w-5" />
+              </Link>
+            </Button>
+          )}
         </nav>
       </div>
     </header>

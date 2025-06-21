@@ -6,6 +6,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { Button, buttonVariants } from '@/components/ui/button'; 
 import { LayoutDashboard, BookCopy, Users, Home, Store, Receipt, Building2, Menu, Tags, BarChart3, FileSpreadsheet } from 'lucide-react';
 import { LanguageSwitcher } from '@/components/language-switcher';
+import { AuthUserMenu } from '@/components/auth-user-menu';
 import { getDictionary } from '@/lib/dictionaries';
 import type { Dictionary } from '@/types';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose, SheetTrigger } from '@/components/ui/sheet'; 
@@ -56,6 +57,7 @@ async function AdminPanelHeader({ lang, dictionary }: { lang: string, dictionary
           </Link>
           <ThemeToggle />
           <LanguageSwitcher dictionary={dictionary}/>
+          <AuthUserMenu lang={lang} dictionary={dictionary} />
         </div>
       </div>
     </header>
