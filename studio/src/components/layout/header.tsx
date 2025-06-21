@@ -6,6 +6,8 @@ import { BookOpen, ShoppingCart, Settings } from 'lucide-react';
 import { CorreoLibroLogo } from '@/components/icons/logo';
 // import { useCart } from '@/hooks/use-cart'; // Temporarily commented out for diagnosis
 import { ThemeToggle } from '@/components/theme-toggle';
+import { UserMenu } from '@/components/user-menu';
+import { useAuth } from '@/context/auth-provider';
 import { Button } from '@/components/ui/button';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import type { Dictionary } from '@/types';
@@ -20,6 +22,7 @@ export function Header({ lang, dictionary }: HeaderProps) {
   // const itemCount = getItemCount(); // Temporarily commented out
   const itemCount = 0; // Placeholder for diagnosis
   const isLoading = true; // Placeholder for diagnosis
+  const { isAuthenticated } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -44,7 +47,11 @@ export function Header({ lang, dictionary }: HeaderProps) {
               )*/}
             </Button>
           </Link>
-          <ThemeToggle />
+          {isAuthenticated ? (
+            <UserMenu lang={lang} dictionary={dictionary} />
+          ) : (
+            <ThemeToggle />
+          )}
           <LanguageSwitcher dictionary={dictionary} />
           <Button asChild variant="ghost" size="icon">
             <Link href={`/${lang}/admin`} aria-label={dictionary.header.admin}>

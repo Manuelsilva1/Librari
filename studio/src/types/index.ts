@@ -155,6 +155,8 @@ export type Dictionary = {
     admin: string;
     toggleTheme: string;
     changeLanguage: string;
+    profile?: string;
+    logout?: string;
   };
   footer: {
     copyright: string;
