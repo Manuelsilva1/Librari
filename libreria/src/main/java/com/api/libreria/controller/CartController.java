@@ -102,11 +102,17 @@ public class CartController {
             });
         }
 
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> new RuntimeException("Libro no encontrado"));
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new RuntimeException("Libro no encontrado"));
 
         // Buscamos si el item ya existe en el carrito
         Optional<CartItem> existingItem = cart.getItems() == null ? Optional.empty()
                 : cart.getItems().stream().filter(item -> item.getBook().getId().equals(bookId)).findFirst();
+
+        int currentQty = existingItem.map(CartItem::getCantidad).orElse(0);
+        if (book.getStock() < currentQty + cantidad) {
+            throw new RuntimeException("Stock insuficiente para: " + book.getTitulo());
+        }
 
         if (existingItem.isPresent()) {
             CartItem item = existingItem.get();
@@ -166,6 +172,10 @@ public class CartController {
         if (cantidad <= 0) {
             cartItemRepository.delete(item);
         } else {
+            Book book = item.getBook();
+            if (cantidad > book.getStock()) {
+                throw new RuntimeException("Stock insuficiente para: " + book.getTitulo());
+            }
             item.setCantidad(cantidad);
             cartItemRepository.save(item);
         }
