@@ -26,18 +26,19 @@ export function CartItemRowClient({ item, lang, dictionary }: CartItemRowClientP
   const bookDetails = item.libro; // The 'libro' field should contain book details
 
   const handleQuantityChange = async (newQuantity: number) => {
-    if (!item.id) return; // Item must have an ID
+    // Use libroId for cart actions since context functions expect it
+    if (!item.libroId) return;
     setIsUpdating(true);
     // Ensure newQuantity is at least 1, or handle removal if 0
     const quantityToUpdate = Math.max(1, newQuantity);
-    await updateItemQuantity(item.id, quantityToUpdate);
+    await updateItemQuantity(item.libroId, quantityToUpdate);
     setIsUpdating(false);
   };
 
   const handleRemoveItem = async () => {
-    if (!item.id) return;
+    if (!item.libroId) return;
     setIsUpdating(true);
-    await removeItem(item.id);
+    await removeItem(item.libroId);
     // No need to setIsUpdating(false) if the item is removed and component unmounts
   };
   
