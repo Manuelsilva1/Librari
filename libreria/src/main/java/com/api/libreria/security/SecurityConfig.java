@@ -1,6 +1,5 @@
 package com.api.libreria.security;
 
-import java.util.List;
 import org.springframework.context.annotation.*;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,9 +11,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 public class SecurityConfig {
@@ -39,6 +35,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/books/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/ofertas/**").permitAll()
                 .requestMatchers("/api/cart/**").permitAll()
+                .requestMatchers("/uploads/**").permitAll()
                 // rutas protegidas
                 .requestMatchers("/api/books/**").hasRole("ADMIN")
                 .requestMatchers("/api/ofertas/**").hasRole("ADMIN")
