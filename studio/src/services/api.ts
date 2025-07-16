@@ -74,6 +74,49 @@ async function fetchApi<T>(endpoint: string, options: FetchApiOptions = {}): Pro
   }
 }
 
+async function fetchApiText(endpoint: string, options: FetchApiOptions = {}): Promise<string> {
+  const url = `${API_BASE_URL}${endpoint}`;
+  const authHeaders = getAuthHeaders();
+
+  const headers: Record<string, string> = {
+    ...authHeaders,
+    ...(options.headers as Record<string, string> | undefined),
+  };
+
+  const config: RequestInit = {
+    ...options,
+    headers,
+  };
+
+  if (options.body && typeof options.body !== 'string') {
+    headers['Content-Type'] = 'application/json';
+    config.body = JSON.stringify(options.body);
+  }
+
+  try {
+    const response = await fetch(url, config);
+
+    if (response.status === 401) {
+      dispatchLogoutEvent();
+    }
+
+    if (!response.ok) {
+      const message = await response.text();
+      const error: ApiResponseError = {
+        message: message || 'API request failed',
+        statusCode: response.status,
+      };
+      throw error;
+    }
+
+    return await response.text();
+  } catch (error) {
+    console.error('API call failed:', error);
+    if (error instanceof Object && 'message' in error) throw error;
+    throw new Error('An unexpected error occurred during API call.');
+  }
+}
+
 // --- Auth ---
 export const loginUser = async (credentials: { email: string; password: string }): Promise<{ token: string; usuario: User }> => {
   if (API_MODE === 'mock') return mockApi.mockLoginUser(credentials);
@@ -296,6 +339,11 @@ export const getAdminSales = async (): Promise<Sale[]> => {
 export const getAdminSaleById = async (saleId: string | number): Promise<Sale> => {
   if (API_MODE === 'mock') return mockApi.mockGetAdminSaleById(saleId);
   return fetchApi<Sale>(`/api/ventas/admin/${saleId}`);
+};
+
+export const getAdminSaleInvoice = async (saleId: string | number): Promise<string> => {
+  if (API_MODE === 'mock') return mockApi.mockGetAdminSaleInvoice(saleId);
+  return fetchApiText(`/api/ventas/admin/${saleId}/invoice`, { headers: { Accept: 'text/html' } });
 };
 
 

@@ -292,6 +292,7 @@
       "tableHeaderPaymentMethod": "Método Pago",
       "tableHeaderActions": "Acciones",
       "viewTicketButton": "Ver Ticket",
+      "viewInvoiceButton": "Ver Factura",
       "cash": "Efectivo",
       "card": "Tarjeta",
       "notApplicable": "N/A",

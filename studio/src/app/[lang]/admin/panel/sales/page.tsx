@@ -25,6 +25,7 @@ export default async function AdminSalesPage({ params }: AdminSalesPageProps) {
     tableHeaderPaymentMethod: "Payment Method",
     tableHeaderActions: "Actions",
     viewTicketButton: "View Ticket",
+    viewInvoiceButton: "View Invoice",
     cash: "Cash",
     card: "Card",
     notApplicable: "N/A",

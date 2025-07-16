@@ -292,6 +292,7 @@
       "tableHeaderPaymentMethod": "Payment Method",
       "tableHeaderActions": "Actions",
       "viewTicketButton": "View Ticket",
+      "viewInvoiceButton": "View Invoice",
       "cash": "Cash",
       "card": "Card",
       "notApplicable": "N/A",

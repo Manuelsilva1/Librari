@@ -4,10 +4,10 @@ import type { Sale, SaleItem, Book, Dictionary } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ArrowLeft, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, ShoppingBag, Printer } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { getBookById } from '@/services/api'; // To fetch book details if not included
+import { getBookById, getAdminSaleInvoice } from '@/services/api'; // To fetch book details if not included
 
 interface SaleDetailClientProps {
   sale: Sale;
@@ -22,6 +22,20 @@ interface EnrichedSaleItem extends SaleItem {
 export function SaleDetailClient({ sale, texts, lang }: SaleDetailClientProps) {
   const [enrichedItems, setEnrichedItems] = useState<EnrichedSaleItem[]>(sale.items);
   const [isLoadingItems, setIsLoadingItems] = useState(false);
+
+  const handleViewInvoice = async () => {
+    try {
+      const html = await getAdminSaleInvoice(sale.id);
+      const w = window.open('', '_blank');
+      if (w) {
+        w.document.open();
+        w.document.write(html);
+        w.document.close();
+      }
+    } catch (err) {
+      console.error('Failed to load invoice', err);
+    }
+  };
 
   useEffect(() => {
     const fetchBookDetailsForItems = async () => {
@@ -147,12 +161,15 @@ export function SaleDetailClient({ sale, texts, lang }: SaleDetailClientProps) {
           )}
         </div>
       </CardContent>
-      <CardFooter className="flex justify-end">
-         <Button variant="outline" asChild>
-            <Link href={`/${lang}/admin/panel/sales`}>
-              <ArrowLeft className="mr-2 h-4 w-4" /> {texts.backToList || "Back to List"}
-            </Link>
-          </Button>
+      <CardFooter className="flex justify-end space-x-2">
+        <Button variant="outline" onClick={handleViewInvoice}>
+          <Printer className="mr-2 h-4 w-4" /> {texts.viewInvoiceButton || 'View Invoice'}
+        </Button>
+        <Button variant="outline" asChild>
+          <Link href={`/${lang}/admin/panel/sales`}>
+            <ArrowLeft className="mr-2 h-4 w-4" /> {texts.backToList || 'Back to List'}
+          </Link>
+        </Button>
       </CardFooter>
     </Card>
   );
