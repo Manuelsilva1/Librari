@@ -112,17 +112,13 @@ async function AdminPanelSidebarNav({ lang, dictionary }: { lang: string, dictio
       ))}
 
       <SheetClose asChild>
-        <Button
-          variant="ghost"
-          className="justify-start w-full h-auto py-2 px-3 text-left text-muted-foreground"
-          disabled
+        <Link
+          href={`/${lang}/admin/panel/customers`}
+          scroll={false}
+          className={cn(navLinkClasses)}
         >
-          <Users className="mr-2 h-4 w-4 mt-1 flex-shrink-0" />
-          <div className="flex flex-col">
-            <span>{sidebarTexts.manageUsers}</span>
-            <span className="text-xs">{sidebarTexts.statusSoon}</span>
-          </div>
-        </Button>
+          <Users className="mr-2 h-4 w-4" /> <span>{sidebarTexts.manageUsers}</span>
+        </Link>
       </SheetClose>
     </nav>
   );

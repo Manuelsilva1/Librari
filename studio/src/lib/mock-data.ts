@@ -60,6 +60,29 @@ export const mockLoginUser = async (credentials: { email: string; password: stri
   throw simulateApiError('Invalid credentials', 401);
 };
 
+// Customers CRUD
+export const mockGetCustomers = async (): Promise<User[]> => simulateApiDelay([...mockUsersStore]);
+
+export const mockCreateCustomer = async (userData: Partial<User>): Promise<User> => {
+  const newUser: User = { id: generateId(), nombre: userData.nombre || 'Nuevo Cliente', email: userData.email || '', rol: 'cliente', activo: userData.activo ?? true, fechaRegistro: new Date().toISOString(), ...userData };
+  mockUsersStore.push(newUser);
+  return simulateApiDelay(newUser);
+};
+
+export const mockUpdateCustomer = async (id: string | number, userData: Partial<User>): Promise<User> => {
+  const index = mockUsersStore.findIndex(u => String(u.id) === String(id));
+  if (index !== -1) {
+    mockUsersStore[index] = { ...mockUsersStore[index], ...userData };
+    return simulateApiDelay(mockUsersStore[index]);
+  }
+  throw simulateApiError('User not found', 404);
+};
+
+export const mockDeleteCustomer = async (id: string | number): Promise<void> => {
+  mockUsersStore = mockUsersStore.filter(u => String(u.id) !== String(id));
+  return simulateApiDelay(undefined);
+};
+
 // Books
 export const mockGetBooks = async (): Promise<Book[]> => simulateApiDelay([...mockBooksStore]);
 
@@ -229,7 +252,7 @@ export const mockCreateSale = async (saleData: CreateSalePayload): Promise<Sale>
   const newSale: Sale = {
     id: generateId(),
     numeroTicket: saleData.numeroTicket,
-    usuarioId: mockLoggedInUser.id,
+    usuarioId: saleData.usuarioId ?? mockLoggedInUser.id,
     fecha: new Date().toISOString(),
     total: totalAmount,
     items: saleItems,

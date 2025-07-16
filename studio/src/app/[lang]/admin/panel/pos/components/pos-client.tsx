@@ -4,7 +4,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { ImageWithFallback } from '@/components/image-with-fallback';
 import { getCoverImageUrl } from '@/lib/utils';
-import type { Book, Sale, CreateSalePayload, CreateSaleItemPayload, ApiResponseError } from '@/types'; // Use API Sale types
+import type { Book, Sale, CreateSalePayload, CreateSaleItemPayload, ApiResponseError, User } from '@/types'; // Use API Sale types
 import type { Dictionary } from '@/types'; 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,7 +16,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { Search, XCircle, PlusCircle, MinusCircle, ShoppingCart, DollarSign, CreditCard, Loader2 } from 'lucide-react';
 // Import createSale from API services
-import { createSale, getNextTicket } from '@/services/api';
+import { createSale, getNextTicket, getCustomers, createCustomer } from '@/services/api';
 import { SaleTicketDialog } from './sale-ticket-dialog'; 
 
 interface PosClientProps {
@@ -37,6 +37,8 @@ export function PosClient({ lang, dictionary, allBooks, posTexts }: PosClientPro
   const [currentOrderItems, setCurrentOrderItems] = useState<OrderItem[]>([]);
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card'>('cash');
   const [customerName, setCustomerName] = useState('');
+  const [customers, setCustomers] = useState<User[]>([]);
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string | number | null>(null);
   const [isProcessingSale, setIsProcessingSale] = useState(false);
   const { toast } = useToast();
   const [completedSale, setCompletedSale] = useState<Sale | null>(null); // Changed SaleRecord to Sale
@@ -48,7 +50,12 @@ export function PosClient({ lang, dictionary, allBooks, posTexts }: PosClientPro
     setSearchResults([]);
     setPaymentMethod('cash');
     setCustomerName('');
+    setSelectedCustomerId(null);
   };
+
+  useEffect(() => {
+    getCustomers().then(setCustomers).catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (searchTerm.trim() === '') {
@@ -123,11 +130,27 @@ export function PosClient({ lang, dictionary, allBooks, posTexts }: PosClientPro
 
     const nextTicketResp = await getNextTicket();
 
+    let customerId = selectedCustomerId;
+    if (!customerId && customerName.trim()) {
+      const existing = customers.find(c => c.nombre.toLowerCase() === customerName.toLowerCase() || c.email.toLowerCase() === customerName.toLowerCase());
+      if (existing) {
+        customerId = existing.id;
+      } else {
+        try {
+          const newCust = await createCustomer({ nombre: customerName, email: '' });
+          customerId = newCust.id;
+          setCustomers(prev => [...prev, newCust]);
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+
     const salePayload: CreateSalePayload = {
       items: saleItemsPayload,
       paymentMethod: paymentMethod,
       numeroTicket: nextTicketResp.nextTicket,
-      // customerName: customerName || undefined, // If API supports it
+      usuarioId: customerId || undefined,
     };
 
     try {
@@ -302,11 +325,22 @@ export function PosClient({ lang, dictionary, allBooks, posTexts }: PosClientPro
                   <Input
                       id="customerName"
                       type="text"
+                      list="customer-list"
                       placeholder={posTexts.customerNamePlaceholder}
                       value={customerName}
-                      onChange={(e) => setCustomerName(e.target.value)}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setCustomerName(val);
+                        const match = customers.find(c => c.nombre === val || c.email === val);
+                        setSelectedCustomerId(match ? match.id : null);
+                      }}
                       className="mt-1"
                   />
+                  <datalist id="customer-list">
+                    {customers.map(c => (
+                      <option key={c.id} value={c.nombre} />
+                    ))}
+                  </datalist>
               </div>
               <Button
                   size="lg"

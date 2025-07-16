@@ -415,3 +415,30 @@ export const getUserProfile = async (userId: string | number): Promise<User> => 
   return fetchApi<User>(`/api/users/${userId}`);
 };
 
+// --- Customers Management ---
+export const getCustomers = async (): Promise<User[]> => {
+  if (API_MODE === 'mock') return mockApi.mockGetCustomers();
+  return fetchApi<User[]>('/api/users');
+};
+
+export const createCustomer = async (userData: Partial<User>): Promise<User> => {
+  if (API_MODE === 'mock') return mockApi.mockCreateCustomer(userData);
+  return fetchApi<User>('/api/users', {
+    method: 'POST',
+    body: userData,
+  });
+};
+
+export const updateCustomer = async (id: string | number, userData: Partial<User>): Promise<User> => {
+  if (API_MODE === 'mock') return mockApi.mockUpdateCustomer(id, userData);
+  return fetchApi<User>(`/api/users/${id}`, {
+    method: 'PUT',
+    body: userData,
+  });
+};
+
+export const deleteCustomer = async (id: string | number): Promise<void> => {
+  if (API_MODE === 'mock') return mockApi.mockDeleteCustomer(id);
+  return fetchApi<void>(`/api/users/${id}`, { method: 'DELETE' });
+};
+

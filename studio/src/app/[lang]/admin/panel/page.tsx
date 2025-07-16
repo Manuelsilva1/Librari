@@ -76,8 +76,10 @@ export default async function AdminDashboardPage({ params: { lang } }: AdminDash
               {texts.registeredUsersCard.newThisWeek.replace('{count}', newUsersThisWeek.toString())}
             </p>
           </CardContent>
-           <CardContent>
-             <Button className="w-full" variant="outline" disabled>{texts.registeredUsersCard.manageUsersButton}</Button>
+         <CardContent>
+             <Link href={`/${lang}/admin/panel/customers`} passHref legacyBehavior>
+               <Button className="w-full" variant="outline">{texts.registeredUsersCard.manageUsersButton}</Button>
+             </Link>
           </CardContent>
         </Card>
       </div>

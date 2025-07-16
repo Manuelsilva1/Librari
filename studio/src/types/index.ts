@@ -5,7 +5,9 @@ export interface User {
   nombre: string;
   email: string;
   rol: 'admin' | 'cliente' | string; // Role can be specific or a general string
-  // Add other fields as necessary, e.g., password (though typically not sent to client), createdAt, etc.
+  // Optional fields used by the admin panel
+  fechaRegistro?: string; // ISO date string
+  activo?: boolean;
 }
 
 export interface Editorial {
@@ -100,6 +102,7 @@ export interface CreateSalePayload {
   items: CreateSaleItemPayload[];
   paymentMethod: string; // e.g., 'credit_card', 'paypal', 'cash_on_delivery'
   numeroTicket: number;
+  usuarioId?: string | number;
   // Optional: Add other fields the backend might expect for sale creation
   // paymentConfirmationToken?: string; // If payment is processed externally first
   // shippingAddressId?: string | number;
