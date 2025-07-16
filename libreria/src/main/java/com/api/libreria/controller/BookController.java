@@ -2,7 +2,6 @@ package com.api.libreria.controller;
 
 import com.api.libreria.model.Book;
 import com.api.libreria.repository.BookRepository;
-import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
