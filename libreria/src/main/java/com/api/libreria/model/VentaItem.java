@@ -2,6 +2,7 @@ package com.api.libreria.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 @Table(name = "venta_items")
@@ -17,6 +18,7 @@ public class VentaItem {
 
     @ManyToOne
     @JoinColumn(name = "venta_id")
+    @JsonBackReference
     private Venta venta;
 
     @ManyToOne

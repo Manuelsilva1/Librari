@@ -2,6 +2,7 @@ package com.api.libreria.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,5 +28,6 @@ public class Venta {
     private String metodoPago;
 
     @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<VentaItem> items;
 }
