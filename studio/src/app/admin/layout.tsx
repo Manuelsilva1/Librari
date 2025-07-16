@@ -45,9 +45,11 @@ function AdminSidebarNav() {
         </Button>
       </Link>
       {/* Add more admin links here if needed */}
-       <Button variant="ghost" className="justify-start w-full" disabled>
-          <Users className="mr-2 h-4 w-4" /> Manage Users (Soon)
+      <Link href="/admin/panel/customers" passHref legacyBehavior>
+        <Button variant="ghost" className="justify-start w-full">
+          <Users className="mr-2 h-4 w-4" /> Manage Users
         </Button>
+      </Link>
     </nav>
   );
 }
