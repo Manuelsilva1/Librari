@@ -64,8 +64,9 @@ export function EditorialListClient({ editorials, onDeleteEditorial, lang, texts
             <TableHeader>
               <TableRow>
                 <TableHead>{texts.tableHeaderName || "Name"}</TableHead>
-                <TableHead>Website</TableHead> {/* Changed from Contact Person */}
-                {/* <TableHead>{texts.tableHeaderEmail || "Email"}</TableHead> */} {/* Removed Email as it's not in API type */}
+                <TableHead>{texts.tableHeaderRut || 'RUT'}</TableHead>
+                <TableHead>{texts.tableHeaderCelular || 'Cellphone'}</TableHead>
+                <TableHead>Website</TableHead>
                 <TableHead className="text-center">{texts.tableHeaderActions || "Actions"}</TableHead>
               </TableRow>
             </TableHeader>
@@ -73,6 +74,8 @@ export function EditorialListClient({ editorials, onDeleteEditorial, lang, texts
               {editorials.map((editorial) => (
                 <TableRow key={editorial.id}>
                   <TableCell className="font-medium">{editorial.nombre}</TableCell> {/* Use nombre */}
+                  <TableCell>{editorial.rut || '-'}</TableCell>
+                  <TableCell>{editorial.celular || '-'}</TableCell>
                   <TableCell>
                     {editorial.sitioWeb ? (
                       <a href={editorial.sitioWeb} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
