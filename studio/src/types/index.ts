@@ -436,6 +436,7 @@ export type Dictionary = {
       tableHeaderPaymentMethod: string;
       tableHeaderActions: string;
       viewTicketButton: string;
+      viewInvoiceButton: string;
       cash: string;
       card: string;
       notApplicable: string;

@@ -260,6 +260,13 @@ export const mockGetAdminSaleById = async (saleId: string | number): Promise<Sal
   throw simulateApiError('Sale not found', 404);
 };
 
+export const mockGetAdminSaleInvoice = async (saleId: string | number): Promise<string> => {
+  const sale = mockSalesStore.find(s => String(s.id) === String(saleId));
+  if (!sale) throw simulateApiError('Sale not found', 404);
+  const html = `<html><body><h1>Invoice #${sale.numeroTicket}</h1></body></html>`;
+  return simulateApiDelay(html);
+};
+
 // Offers
 export const mockGetOffers = async (): Promise<Offer[]> => simulateApiDelay([...mockOffersStore]);
 
