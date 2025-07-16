@@ -1,0 +1,7 @@
+# Ignore Node.js files at root
+node_modules/
+.yarn/
+.pnp.cjs
+package.json
+package-lock.json
+yarn.lock
