@@ -69,11 +69,12 @@ export interface Cart {
 
 export interface SaleItem {
   id?: number | string; // Optional, depends on DB structure for sale line items
-  libroId: number | string;
+  libroId?: number | string; // Some endpoints may omit this and include a full book
   cantidad: number;
   precioUnitario: number; // Price at the time of sale
   // Optional: include full book object if API sends it nested
-  // libro?: Book;
+  libro?: Book; // Some endpoints use 'libro'
+  book?: Book;  // Others might use 'book'
 }
 
 export interface Sale {
