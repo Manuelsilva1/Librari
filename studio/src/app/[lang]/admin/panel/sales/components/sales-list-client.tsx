@@ -35,18 +35,14 @@ export function SalesListClient({ sales, lang, texts }: SalesListClientProps) {
 
   return (
     <>
-      {/* Filter UI Card removed for simplification in this step */}
-      {/* <Card className="mb-6 shadow-md rounded-lg"> ... </Card> */}
-
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>{texts.tableHeaderSaleId || "Sale ID"}</TableHead>
             <TableHead>{texts.tableHeaderDate || "Date"}</TableHead>
-            <TableHead>User ID</TableHead> {/* Changed from Customer */}
+            <TableHead>User ID</TableHead>
             <TableHead className="text-right">{texts.tableHeaderTotalAmount || "Total"}</TableHead>
             <TableHead className="text-center">Items</TableHead>
-            {/* <TableHead>{texts.tableHeaderPaymentMethod || "Payment Method"}</TableHead> */} {/* Payment method not directly on Sale type */}
             <TableHead className="text-center">{texts.tableHeaderActions || "Actions"}</TableHead>
           </TableRow>
         </TableHeader>
@@ -59,10 +55,9 @@ export function SalesListClient({ sales, lang, texts }: SalesListClientProps) {
               <TableCell>
                 {new Date(sale.fecha).toLocaleDateString(lang, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
               </TableCell>
-              <TableCell>{sale.usuarioId || (texts.notApplicable || "N/A")}</TableCell> {/* Display usuarioId */}
+              <TableCell>{sale.usuarioId || (texts.notApplicable || "N/A")}</TableCell>
               <TableCell className="text-right">UYU {sale.total.toFixed(2)}</TableCell>
               <TableCell className="text-center">{sale.items.length}</TableCell>
-              {/* <TableCell>{sale.paymentMethod || (texts.notApplicable || "N/A")}</TableCell> */}
               <TableCell className="text-center">
                 <Button variant="outline" size="sm" asChild>
                   <Link href={`/${lang}/admin/panel/sales?view=detail&id=${sale.id}`}>
@@ -74,8 +69,6 @@ export function SalesListClient({ sales, lang, texts }: SalesListClientProps) {
           ))}
         </TableBody>
       </Table>
-      
-      {/* SaleTicketDialog removed from here, will be part of SaleDetailClient if needed */}
-    </>
-  );
+      </>
+    );
 }
