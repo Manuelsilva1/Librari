@@ -73,6 +73,14 @@ public class VentaController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping(value = "/admin/{id}/invoice", produces = "text/html")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> getVentaAdminInvoice(@PathVariable Long id) {
+        return ventaService.getVentaWithItemsById(id)
+                .map(v -> ResponseEntity.ok(ventaService.generateInvoiceHtml(v)))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     private Long getUserId(String nombre) {
         // Auth stores the username value, so search by username instead of email
         return userRepository.findByUsername(nombre).orElseThrow().getId();

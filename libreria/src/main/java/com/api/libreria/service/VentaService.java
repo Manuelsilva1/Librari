@@ -143,4 +143,38 @@ public class VentaService  {
     public Optional<Venta> getVentaById(Long id) {
         return ventaRepository.findById(id);
     }
+
+    @Transactional(readOnly = true)
+    public Optional<Venta> getVentaWithItemsById(Long id) {
+        return ventaRepository.findById(id).map(v -> {
+            v.getItems().size(); // force lazy collection initialization
+            return v;
+        });
+    }
+
+    public String generateInvoiceHtml(Venta venta) {
+        String userName = userRepository.findById(venta.getUsuarioId())
+                .map(User::getUsername)
+                .orElse("Desconocido");
+
+        StringBuilder html = new StringBuilder();
+        html.append("<html><body>");
+        html.append("<h1>Factura #").append(venta.getNumeroTicket()).append("</h1>");
+        html.append("<p>Cliente: ").append(userName).append("</p>");
+        html.append("<p>Fecha: ").append(venta.getFecha()).append("</p>");
+        html.append("<p>Método de pago: ").append(venta.getMetodoPago()).append("</p>");
+        html.append("<table border='1'><thead><tr><th>Libro</th><th>Cantidad</th><th>Precio unitario</th><th>Total</th></tr></thead><tbody>");
+        for (VentaItem item : venta.getItems()) {
+            html.append("<tr>")
+                .append("<td>").append(item.getBook().getTitulo()).append("</td>")
+                .append("<td>").append(item.getCantidad()).append("</td>")
+                .append("<td>").append(item.getPrecioUnitario()).append("</td>")
+                .append("<td>").append(item.getCantidad() * item.getPrecioUnitario()).append("</td>")
+                .append("</tr>");
+        }
+        html.append("</tbody></table>");
+        html.append("<p>Total: ").append(venta.getTotal()).append("</p>");
+        html.append("</body></html>");
+        return html.toString();
+    }
 }
