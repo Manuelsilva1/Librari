@@ -30,7 +30,7 @@ const SECTIONS: { title: string; items: Item[] }[] = [
   {
     title: "Gestión",
     items: [
-      { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+      { href: "", label: "Dashboard", icon: LayoutDashboard },
       { href: "/books", label: "Libros", icon: BookCopy },
       { href: "/categories", label: "Categorías", icon: Tags },
       { href: "/editorials", label: "Editoriales", icon: Building2 },
