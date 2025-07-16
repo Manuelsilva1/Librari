@@ -40,15 +40,25 @@ export function SaleDetailClient({ sale, texts, lang }: SaleDetailClientProps) {
   useEffect(() => {
     const fetchBookDetailsForItems = async () => {
       // Check if any item is missing 'libroDetails' or essential fields like 'titulo'
-      const itemsToFetch = sale.items.filter(item => !item.libro || !item.libro.titulo);
+      const itemsToFetch = sale.items.filter(item =>
+        !(item.libro && item.libro.titulo) &&
+        !(item.book && item.book.titulo)
+      );
       if (itemsToFetch.length === 0) {
-        // If all items already have 'libro.titulo', assume 'libro' is sufficiently populated
-        // Or, if your SaleItem from API never includes 'libro', then always fetch.
-        // For this example, if item.libro exists and has a titulo, we skip fetching for that item.
-        // If item.libro itself is missing, we definitely fetch.
-        const alreadyEnriched = sale.items.every(item => item.libro && item.libro.titulo);
+        // If all items already have title information, skip fetching
+        const alreadyEnriched = sale.items.every(item =>
+          (item.libro && item.libro.titulo) ||
+          (item.book && item.book.titulo)
+        );
         if (alreadyEnriched) {
-          setEnrichedItems(sale.items as EnrichedSaleItem[]); // Cast if confident
+          // Normalize potential `book` field into `libro` for consistency
+          const normalized = sale.items.map(i => {
+            let result = i as EnrichedSaleItem;
+            if (i.book && !i.libro) result = { ...result, libro: i.book };
+            if (!i.libroId && i.book?.id) result = { ...result, libroId: i.book.id };
+            return result;
+          });
+          setEnrichedItems(normalized);
           return;
         }
       }
@@ -56,13 +66,15 @@ export function SaleDetailClient({ sale, texts, lang }: SaleDetailClientProps) {
       setIsLoadingItems(true);
       const promises = sale.items.map(async (item) => {
         if (item.libro && item.libro.titulo) return item as EnrichedSaleItem; // Already good
-        if (!item.libroId) return { ...item, libroDetails: undefined } as EnrichedSaleItem; // No ID to fetch
+        if (item.book && item.book.titulo) return { ...item, libro: item.book } as EnrichedSaleItem;
+        const idToFetch = item.libroId ?? item.book?.id;
+        if (!idToFetch) return { ...item, libroDetails: undefined } as EnrichedSaleItem; // No ID to fetch
 
         try {
-          const bookDetails = await getBookById(item.libroId);
+          const bookDetails = await getBookById(idToFetch);
           return { ...item, libroDetails: bookDetails } as EnrichedSaleItem;
         } catch (error) {
-          console.error(`Failed to fetch details for book ID ${item.libroId}:`, error);
+          console.error(`Failed to fetch details for book ID ${idToFetch}:`, error);
           return { ...item, libroDetails: { titulo: "Error loading book" } } as EnrichedSaleItem; // Add placeholder on error
         }
       });
@@ -146,8 +158,8 @@ export function SaleDetailClient({ sale, texts, lang }: SaleDetailClientProps) {
                 {enrichedItems.map((item, index) => (
                   <TableRow key={item.id || `item-${index}`}>
                     <TableCell className="font-medium">
-                      {item.libroDetails?.titulo || item.libro?.titulo || `Book ID: ${item.libroId}` } 
-                      {(!item.libroDetails && !item.libro) && <span className="text-xs text-muted-foreground italic"> (Details pending)</span>}
+                      {item.libroDetails?.titulo || item.libro?.titulo || item.book?.titulo || `Book ID: ${item.libroId ?? item.book?.id}` }
+                      {(!item.libroDetails && !item.libro && !item.book) && <span className="text-xs text-muted-foreground italic"> (Details pending)</span>}
                     </TableCell>
                     <TableCell className="text-center">{item.cantidad}</TableCell>
                     <TableCell className="text-right">UYU {item.precioUnitario.toFixed(2)}</TableCell>
