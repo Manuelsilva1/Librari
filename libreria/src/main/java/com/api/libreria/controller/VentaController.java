@@ -32,9 +32,9 @@ public class VentaController {
 
     @PostMapping("/checkout")
     public ResponseEntity<Venta> checkout(@AuthenticationPrincipal UserDetails userDetails,
-                                          @RequestParam String metodoPago) {
+                                          @RequestBody CreateSaleRequest request) {
         Long userId = getUserId(userDetails.getUsername());
-        Venta venta = ventaService.crearVentaDesdeCarrito(userId, metodoPago);
+        Venta venta = ventaService.crearVentaDesdeItems(userId, request.getPaymentMethod(), request.getItems());
         return ResponseEntity.ok(venta);
     }
 
@@ -42,7 +42,7 @@ public class VentaController {
     public ResponseEntity<Venta> crearVenta(@AuthenticationPrincipal UserDetails userDetails,
                                             @RequestBody CreateSaleRequest request) {
         Long userId = getUserId(userDetails.getUsername());
-        Venta venta = ventaService.crearVentaDesdeCarrito(userId, request.getPaymentMethod());
+        Venta venta = ventaService.crearVentaDesdeItems(userId, request.getPaymentMethod(), request.getItems());
         return ResponseEntity.ok(venta);
     }
 
