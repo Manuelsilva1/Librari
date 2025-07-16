@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { BookCopy, PlusCircle, LineChart, Users } from "lucide-react";
 import Link from "next/link";
 import { getDictionary } from '@/lib/dictionaries';
-import type { Dictionary } from '@/types'; // Updated import
+import { getDashboardStats } from '@/services/api';
+import type { Dictionary, DashboardStats } from '@/types';
 
 interface AdminDashboardPageProps {
   params: any;
@@ -19,12 +20,25 @@ export default async function AdminDashboardPage({ params: { lang } }: AdminDash
     registeredUsersCard: { title: "Registered Users", usersCount: "{count}", newThisWeek: "+{count} new this week", manageUsersButton: "Manage Users"},
     quickActionsCard: { title: "Quick Actions", addNewBookButton: "Add New Book", generateReportButton: "Generate Sales Report", viewLogsButton: "View System Logs"},
   };
-  // Placeholder data
-  const bookCount = 125;
-  const totalSalesAmount = "1,234.56";
-  const salesPercentage = "10.2";
-  const userCount = 78;
-  const newUsersThisWeek = 5;
+  let stats: DashboardStats = {
+    booksCount: 0,
+    totalSales: 0,
+    salesPercentageChange: 0,
+    usersCount: 0,
+    newUsersThisWeek: 0,
+  };
+
+  try {
+    stats = await getDashboardStats();
+  } catch (error) {
+    console.error('Failed to load dashboard stats', error);
+  }
+
+  const bookCount = stats.booksCount;
+  const totalSalesAmount = stats.totalSales.toFixed(2);
+  const salesPercentage = stats.salesPercentageChange.toFixed(1);
+  const userCount = stats.usersCount;
+  const newUsersThisWeek = stats.newUsersThisWeek;
 
   return (
     <div className="space-y-8">

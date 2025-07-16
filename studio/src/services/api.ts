@@ -1,6 +1,6 @@
 
 import { getAuthHeaders, dispatchLogoutEvent } from '@/lib/auth-utils';
-import type { Book, Category, Editorial, User, Cart, Sale, Offer, CreateSalePayload, CreateOfferPayload, ApiResponseError } from '@/types'; // Ensure all necessary types are imported
+import type { Book, Category, Editorial, User, Cart, Sale, Offer, CreateSalePayload, CreateOfferPayload, ApiResponseError, DashboardStats } from '@/types';
 
 // Import mock functions
 import * as mockApi from '@/lib/mock-data';
@@ -344,6 +344,19 @@ export const getAdminSaleById = async (saleId: string | number): Promise<Sale> =
 export const getAdminSaleInvoice = async (saleId: string | number): Promise<string> => {
   if (API_MODE === 'mock') return mockApi.mockGetAdminSaleInvoice(saleId);
   return fetchApiText(`/api/ventas/admin/${saleId}/invoice`, { headers: { Accept: 'text/html' } });
+};
+
+export const getDashboardStats = async (): Promise<DashboardStats> => {
+  if (API_MODE === 'mock') {
+    return {
+      booksCount: 125,
+      totalSales: 1234.56,
+      salesPercentageChange: 10.2,
+      usersCount: 78,
+      newUsersThisWeek: 5,
+    };
+  }
+  return fetchApi<DashboardStats>('/api/admin/stats');
 };
 
 
