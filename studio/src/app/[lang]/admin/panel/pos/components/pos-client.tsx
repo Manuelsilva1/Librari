@@ -132,7 +132,12 @@ export function PosClient({ lang, dictionary, allBooks, posTexts }: PosClientPro
 
     let customerId = selectedCustomerId;
     if (!customerId && customerName.trim()) {
-      const existing = customers.find(c => c.nombre.toLowerCase() === customerName.toLowerCase() || c.email.toLowerCase() === customerName.toLowerCase());
+      const lower = customerName.toLowerCase();
+      const existing = customers.find(
+        c =>
+          (c.nombre && c.nombre.toLowerCase() === lower) ||
+          (c.email && c.email.toLowerCase() === lower)
+      );
       if (existing) {
         customerId = existing.id;
       } else {
