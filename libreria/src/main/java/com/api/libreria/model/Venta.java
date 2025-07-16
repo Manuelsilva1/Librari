@@ -20,6 +20,7 @@ public class Venta {
     private Long id;
 
     @Column(name = "numero_ticket", nullable = false, unique = true)
+    
     private Integer numeroTicket;
 
     private Long usuarioId;
