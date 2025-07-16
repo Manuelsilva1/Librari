@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, use } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import type { Sale, ApiResponseError } from '@/types';
 import { getAdminSales, getAdminSaleById } from '@/services/api';
@@ -11,7 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 
 interface ManageSalesContentProps {
-  params: { lang: string };
+  params: { lang: string } | Promise<{ lang: string }>;
   texts: any; // Dictionary texts for sales admin
 }
 
@@ -19,7 +19,7 @@ export function ManageSalesContent({ params, texts }: ManageSalesContentProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
-  const { lang } = params;
+  const { lang } = use(params);
 
   const view = searchParams.get('view');
   const saleId = searchParams.get('id');
