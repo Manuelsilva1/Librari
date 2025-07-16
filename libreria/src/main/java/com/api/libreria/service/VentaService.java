@@ -2,6 +2,7 @@ package com.api.libreria.service;
 
 import com.api.libreria.model.*;
 import com.api.libreria.repository.*;
+import com.api.libreria.dto.CreateSaleItemRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -78,6 +79,51 @@ public class VentaService  {
 
         // Vaciar carrito
         cartItemRepository.deleteAll(cart.getItems());
+
+        return venta;
+    }
+
+    @Transactional
+    public Venta crearVentaDesdeItems(Long userId, String metodoPago, List<CreateSaleItemRequest> items) {
+        if (items == null || items.isEmpty()) {
+            throw new RuntimeException("El carrito est\u00e1 vac\u00edo");
+        }
+
+        Map<Long, Book> books = new HashMap<>();
+
+        for (CreateSaleItemRequest item : items) {
+            Book book = bookRepository.findById(item.getLibroId())
+                    .orElseThrow(() -> new RuntimeException("Libro no encontrado"));
+            if (book.getStock() < item.getCantidad()) {
+                throw new RuntimeException("Stock insuficiente para: " + book.getTitulo());
+            }
+            books.put(item.getLibroId(), book);
+        }
+
+        Venta venta = new Venta();
+        venta.setUsuarioId(userId);
+        venta.setFecha(LocalDateTime.now());
+        venta.setMetodoPago(metodoPago);
+        venta = ventaRepository.save(venta);
+
+        double total = 0.0;
+        for (CreateSaleItemRequest item : items) {
+            Book book = books.get(item.getLibroId());
+            book.setStock(book.getStock() - item.getCantidad());
+            bookRepository.save(book);
+
+            VentaItem ventaItem = new VentaItem();
+            ventaItem.setVenta(venta);
+            ventaItem.setBook(book);
+            ventaItem.setCantidad(item.getCantidad());
+            ventaItem.setPrecioUnitario(item.getPrecioUnitario());
+            ventaItemRepository.save(ventaItem);
+
+            total += item.getCantidad() * item.getPrecioUnitario();
+        }
+
+        venta.setTotal(total);
+        ventaRepository.save(venta);
 
         return venta;
     }
