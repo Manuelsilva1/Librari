@@ -1,5 +1,13 @@
+import { cookies } from 'next/headers';
+
 export const getAuthHeaders = (): Record<string, string> => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+  let token: string | null | undefined = null;
+
+  if (typeof window !== 'undefined') {
+    token = localStorage.getItem('authToken');
+  } else {
+    token = cookies().get('authToken')?.value;
+  }
 
   const headers: Record<string, string> = {};
 
