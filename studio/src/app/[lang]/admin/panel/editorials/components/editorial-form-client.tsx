@@ -16,9 +16,11 @@ import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 
 const editorialSchema = z.object({
-  // API Editorial type has 'nombre' and 'sitioWeb' (optional)
+  // API Editorial type has 'nombre', 'rut', 'celular' and optional 'sitioWeb'
   nombre: z.string().min(2, "Publisher name must be at least 2 characters"),
   sitioWeb: z.string().url("Must be a valid URL (e.g., https://example.com)").optional().or(z.literal('')).nullable(),
+  rut: z.string().optional().or(z.literal('')).nullable(),
+  celular: z.string().optional().or(z.literal('')).nullable(),
 });
 
 type EditorialFormData = z.infer<typeof editorialSchema>;
@@ -41,9 +43,13 @@ export function EditorialFormClient({ editorial, onSave, onDelete, lang, texts }
     defaultValues: editorial ? {
       nombre: editorial.nombre || '',
       sitioWeb: editorial.sitioWeb || '',
+      rut: editorial.rut || '',
+      celular: editorial.celular || '',
     } : {
       nombre: '',
       sitioWeb: '',
+      rut: '',
+      celular: '',
     },
   });
   
@@ -52,9 +58,11 @@ export function EditorialFormClient({ editorial, onSave, onDelete, lang, texts }
       form.reset({
         nombre: editorial.nombre || '',
         sitioWeb: editorial.sitioWeb || '',
+        rut: editorial.rut || '',
+        celular: editorial.celular || '',
       });
     } else {
-      form.reset({ nombre: '', sitioWeb: '' });
+      form.reset({ nombre: '', sitioWeb: '', rut: '', celular: '' });
     }
   }, [editorial, form]);
 
@@ -65,6 +73,8 @@ export function EditorialFormClient({ editorial, onSave, onDelete, lang, texts }
         id: editorial?.id, // Include ID if it's an update
         nombre: formData.nombre,
         sitioWeb: formData.sitioWeb || undefined, // Ensure empty string becomes undefined if API expects that for optional fields
+        rut: formData.rut || undefined,
+        celular: formData.celular || undefined,
       };
       await onSave(editorialToSave);
       toast({
@@ -124,8 +134,22 @@ export function EditorialFormClient({ editorial, onSave, onDelete, lang, texts }
             )} />
             <FormField control={form.control} name="sitioWeb" render={({ field }) => ( // Added sitioWeb
               <FormItem>
-                <FormLabel>Website URL (Optional)</FormLabel> 
+                <FormLabel>Website URL (Optional)</FormLabel>
                 <FormControl><Input placeholder="https://example.com" {...field} value={field.value ?? ''} /></FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
+            <FormField control={form.control} name="rut" render={({ field }) => (
+              <FormItem>
+                <FormLabel>{texts.rutLabel || 'RUT'}</FormLabel>
+                <FormControl><Input placeholder={texts.rutPlaceholder} {...field} value={field.value ?? ''} /></FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
+            <FormField control={form.control} name="celular" render={({ field }) => (
+              <FormItem>
+                <FormLabel>{texts.celularLabel || 'Cellphone'}</FormLabel>
+                <FormControl><Input placeholder={texts.celularPlaceholder} {...field} value={field.value ?? ''} /></FormControl>
                 <FormMessage />
               </FormItem>
             )} />

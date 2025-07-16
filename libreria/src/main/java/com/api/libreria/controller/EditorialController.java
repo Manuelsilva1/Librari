@@ -38,6 +38,8 @@ public class EditorialController {
 
         existing.setNombre(editorial.getNombre());
         existing.setSitioWeb(editorial.getSitioWeb());
+        existing.setRut(editorial.getRut());
+        existing.setCelular(editorial.getCelular());
 
         Editorial updated = editorialRepository.save(existing);
         return ResponseEntity.ok(updated);

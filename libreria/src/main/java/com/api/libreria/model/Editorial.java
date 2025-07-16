@@ -18,4 +18,8 @@ public class Editorial {
     private String nombre;
 
     private String sitioWeb;
+
+    private String rut;
+
+    private String celular;
 }

@@ -12,6 +12,8 @@ export interface Editorial {
   id: number | string;
   nombre: string;
   sitioWeb?: string; // Optional as per original, but good to have
+  rut?: string;
+  celular?: string;
   // The following fields were in the original type, keeping them commented for now
   // contactPerson?: string;
   // email?: string; // This might be the company email, not user email
@@ -327,6 +329,10 @@ export type Dictionary = {
       emailPlaceholder: string;
       phoneLabel: string;
       phonePlaceholder: string;
+      rutLabel: string;
+      rutPlaceholder: string;
+      celularLabel: string;
+      celularPlaceholder: string;
       addressLabel: string;
       addressPlaceholder: string;
       notesLabel: string;
@@ -339,6 +345,8 @@ export type Dictionary = {
       addButton: string;
       noEditorialsFound: string;
       tableHeaderName: string;
+      tableHeaderRut: string;
+      tableHeaderCelular: string;
       tableHeaderContact: string;
       tableHeaderEmail: string;
       tableHeaderActions: string;

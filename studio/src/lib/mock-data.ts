@@ -18,9 +18,9 @@ let mockCategoriesStore: Category[] = [
 ];
 
 let mockEditorialsStore: Editorial[] = [
-  { id: '1', nombre: 'Editorial Planeta', sitioWeb: 'https://www.planeta.es' },
-  { id: '2', nombre: 'Sudamericana', sitioWeb: 'https://www.penguinlibros.com/ar/sudamericana' },
-  { id: '3', nombre: 'Alfaguara', sitioWeb: 'https://www.penguinlibros.com/es/alfaguara' },
+  { id: '1', nombre: 'Editorial Planeta', sitioWeb: 'https://www.planeta.es', rut: '11.111.111-1', celular: '912345678' },
+  { id: '2', nombre: 'Sudamericana', sitioWeb: 'https://www.penguinlibros.com/ar/sudamericana', rut: '22.222.222-2', celular: '923456789' },
+  { id: '3', nombre: 'Alfaguara', sitioWeb: 'https://www.penguinlibros.com/es/alfaguara', rut: '33.333.333-3', celular: '934567890' },
 ];
 
 let mockUsersStore: User[] = [
