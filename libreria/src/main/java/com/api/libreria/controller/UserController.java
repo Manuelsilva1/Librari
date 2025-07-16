@@ -2,8 +2,7 @@ package com.api.libreria.controller;
 
 import com.api.libreria.model.User;
 import com.api.libreria.service.UserService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,8 +19,8 @@ public class UserController {
     }
 
     @GetMapping
-    public Page<User> getAllUsers(Pageable pageable) {
-        return userService.getAllUsers(pageable);
+    public List<User> getAllUsers() {
+        return userService.getAllUsers();
     }
 
     @GetMapping("/{id}")
@@ -34,6 +33,11 @@ public class UserController {
     @PostMapping
     public ResponseEntity<User> saveUser(@RequestBody User user) {
         return ResponseEntity.ok(userService.saveUser(user));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
+        return ResponseEntity.ok(userService.updateUser(id, user));
     }
 
     @DeleteMapping("/{id}")
