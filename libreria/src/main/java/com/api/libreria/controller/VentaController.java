@@ -30,11 +30,17 @@ public class VentaController {
         this.userRepository = userRepository;
     }
 
+    @GetMapping("/next-ticket")
+    public ResponseEntity<?> getNextTicket() {
+        Integer next = ventaService.getNextTicket();
+        return ResponseEntity.ok(java.util.Collections.singletonMap("nextTicket", next));
+    }
+
     @PostMapping("/checkout")
     public ResponseEntity<Venta> checkout(@AuthenticationPrincipal UserDetails userDetails,
                                           @RequestBody CreateSaleRequest request) {
         Long userId = getUserId(userDetails.getUsername());
-        Venta venta = ventaService.crearVentaDesdeItems(userId, request.getPaymentMethod(), request.getItems());
+        Venta venta = ventaService.crearVentaDesdeItems(userId, request.getPaymentMethod(), request.getNumeroTicket(), request.getItems());
         return ResponseEntity.ok(venta);
     }
 
@@ -42,7 +48,7 @@ public class VentaController {
     public ResponseEntity<Venta> crearVenta(@AuthenticationPrincipal UserDetails userDetails,
                                             @RequestBody CreateSaleRequest request) {
         Long userId = getUserId(userDetails.getUsername());
-        Venta venta = ventaService.crearVentaDesdeItems(userId, request.getPaymentMethod(), request.getItems());
+        Venta venta = ventaService.crearVentaDesdeItems(userId, request.getPaymentMethod(), request.getNumeroTicket(), request.getItems());
         return ResponseEntity.ok(venta);
     }
 

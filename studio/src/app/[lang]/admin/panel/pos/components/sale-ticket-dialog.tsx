@@ -26,7 +26,7 @@ interface SaleTicketDialogProps {
 }
 
 export function SaleTicketDialog({ isOpen, onClose, saleRecord, dictionary }: SaleTicketDialogProps) {
-  if (!saleRecord) return null;
+  if (!saleRecord || !saleRecord.items || saleRecord.items.length === 0) return null;
 
   const texts = dictionary.adminPanel?.posPage?.ticketDialog || { 
     title: "Sale Receipt",
@@ -49,7 +49,7 @@ export function SaleTicketDialog({ isOpen, onClose, saleRecord, dictionary }: Sa
 
 
   const handlePrint = () => {
-    console.log("Simulating print for sale ID:", saleRecord.id);
+    console.log("Simulating print for ticket:", saleRecord.numeroTicket);
   };
 
   return (
@@ -58,7 +58,7 @@ export function SaleTicketDialog({ isOpen, onClose, saleRecord, dictionary }: Sa
         <AlertDialogHeader>
           <AlertDialogTitle className="font-headline text-2xl text-primary">{texts.title}</AlertDialogTitle>
           <AlertDialogDescription>
-            {texts.saleId} <span className="font-mono text-xs">{saleRecord.id}</span><br/>
+            {texts.saleId} <span className="font-mono text-xs">{saleRecord.numeroTicket}</span><br/>
             {texts.date} {new Date(saleRecord.fecha).toLocaleString(dictionary.locale)}<br/>
             {texts.customer} {saleRecord.usuarioId ?? texts.notApplicableShort}
           </AlertDialogDescription>

@@ -228,6 +228,7 @@ export const mockCreateSale = async (saleData: CreateSalePayload): Promise<Sale>
 
   const newSale: Sale = {
     id: generateId(),
+    numeroTicket: saleData.numeroTicket,
     usuarioId: mockLoggedInUser.id,
     fecha: new Date().toISOString(),
     total: totalAmount,
@@ -237,6 +238,12 @@ export const mockCreateSale = async (saleData: CreateSalePayload): Promise<Sale>
   mockSalesStore.unshift(newSale);
   mockCartStore = null; // Clear cart after sale
   return simulateApiDelay(newSale);
+};
+
+export const mockGetNextTicket = async (): Promise<{ nextTicket: number }> => {
+  const last = mockSalesStore[0];
+  const nextTicket = last ? (last.numeroTicket + 1) : 1;
+  return simulateApiDelay({ nextTicket });
 };
 
 export const mockGetUserSales = async (): Promise<Sale[]> => {

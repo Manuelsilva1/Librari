@@ -78,6 +78,7 @@ export interface SaleItem {
 
 export interface Sale {
   id: number | string;
+  numeroTicket: number;
   usuarioId?: number | string; // Can be null if it's a guest sale or POS
   fecha: string; // ISO date string typically
   total: number;
@@ -97,6 +98,7 @@ export interface CreateSaleItemPayload {
 export interface CreateSalePayload {
   items: CreateSaleItemPayload[];
   paymentMethod: string; // e.g., 'credit_card', 'paypal', 'cash_on_delivery'
+  numeroTicket: number;
   // Optional: Add other fields the backend might expect for sale creation
   // paymentConfirmationToken?: string; // If payment is processed externally first
   // shippingAddressId?: string | number;
