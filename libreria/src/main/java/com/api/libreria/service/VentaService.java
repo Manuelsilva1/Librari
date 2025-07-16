@@ -31,7 +31,13 @@ public class VentaService  {
     }
 
     @Transactional
-    public Venta crearVentaDesdeCarrito(Long userId, String metodoPago) {
+    public synchronized Integer getNextTicket() {
+        Venta last = ventaRepository.findTopByOrderByNumeroTicketDesc();
+        return last == null ? 1 : last.getNumeroTicket() + 1;
+    }
+
+    @Transactional
+    public Venta crearVentaDesdeCarrito(Long userId, String metodoPago, Integer numeroTicket) {
         Cart cart = cartRepository.findByUsuarioId(userId)
                 .orElseThrow(() -> new RuntimeException("Carrito no encontrado"));
 
@@ -55,6 +61,7 @@ public class VentaService  {
 
         Venta venta = new Venta();
         venta.setUsuarioId(userId);
+        venta.setNumeroTicket(numeroTicket);
         venta.setFecha(LocalDateTime.now());
         venta.setMetodoPago(metodoPago);
         venta.setTotal(0.0);
@@ -84,7 +91,7 @@ public class VentaService  {
     }
 
     @Transactional
-    public Venta crearVentaDesdeItems(Long userId, String metodoPago, List<CreateSaleItemRequest> items) {
+    public Venta crearVentaDesdeItems(Long userId, String metodoPago, Integer numeroTicket, List<CreateSaleItemRequest> items) {
         if (items == null || items.isEmpty()) {
             throw new RuntimeException("El carrito est\u00e1 vac\u00edo");
         }
@@ -102,6 +109,7 @@ public class VentaService  {
 
         Venta venta = new Venta();
         venta.setUsuarioId(userId);
+        venta.setNumeroTicket(numeroTicket);
         venta.setFecha(LocalDateTime.now());
         venta.setMetodoPago(metodoPago);
         venta = ventaRepository.save(venta);

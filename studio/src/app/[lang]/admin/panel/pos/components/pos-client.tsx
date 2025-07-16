@@ -16,7 +16,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { Search, XCircle, PlusCircle, MinusCircle, ShoppingCart, DollarSign, CreditCard, Loader2 } from 'lucide-react';
 // Import createSale from API services
-import { createSale } from '@/services/api'; 
+import { createSale, getNextTicket } from '@/services/api';
 import { SaleTicketDialog } from './sale-ticket-dialog'; 
 
 interface PosClientProps {
@@ -110,12 +110,15 @@ export function PosClient({ lang, dictionary, allBooks, posTexts }: PosClientPro
     const saleItemsPayload: CreateSaleItemPayload[] = currentOrderItems.map(item => ({
       libroId: item.book.id,
       cantidad: item.quantity,
-      precioUnitario: item.book.precio, 
+      precioUnitario: item.book.precio,
     }));
+
+    const nextTicketResp = await getNextTicket();
 
     const salePayload: CreateSalePayload = {
       items: saleItemsPayload,
       paymentMethod: paymentMethod,
+      numeroTicket: nextTicketResp.nextTicket,
       // customerName: customerName || undefined, // If API supports it
     };
 
@@ -125,7 +128,7 @@ export function PosClient({ lang, dictionary, allBooks, posTexts }: PosClientPro
       setIsTicketDialogOpen(true); 
       toast({
         title: posTexts.saleCompletedToastTitle,
-        description: posTexts.saleCompletedToastDesc + (createdSale.id ? ` ID: ${createdSale.id}` : ""),
+        description: posTexts.saleCompletedToastDesc + ` Ticket: ${createdSale.numeroTicket}`,
       });
     } catch (error) {
       const apiError = error as ApiResponseError;

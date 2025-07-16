@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useCart } from '@/hooks/use-cart';
 import { useAuth } from '@/context/auth-provider'; // Import useAuth
-import { createSale } from '@/services/api'; // Import createSale
+import { createSale, getNextTicket } from '@/services/api'; // Import createSale
 import type { CreateSalePayload, CreateSaleItemPayload, ApiResponseError } from '@/types'; // Import necessary types
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -129,9 +129,12 @@ export function CheckoutFormClient({ lang, dictionary }: CheckoutFormClientProps
         precioUnitario: item.precioUnitario,
       }));
 
+      const next = await getNextTicket();
+
       const salePayload: CreateSalePayload = {
         items: saleItems,
         paymentMethod: data.paymentMethod, // From form
+        numeroTicket: next.nextTicket,
         // Add other fields from 'data' if needed by your backend for CreateSalePayload
         // e.g. customerName: data.name, shippingAddress: `${data.address}, ${data.city}, ${data.state} ${data.zip}`
         // For now, keeping it simple as per defined CreateSalePayload
@@ -141,7 +144,7 @@ export function CheckoutFormClient({ lang, dictionary }: CheckoutFormClientProps
       
       toast({
         title: texts.orderSubmittedToast,
-        description: `${texts.orderSubmittedToastDesc} Order ID: ${createdSale.id}`,
+        description: `${texts.orderSubmittedToastDesc} Ticket: ${createdSale.numeroTicket}`,
       });
       
       await clearCartContextAction(); // Clear cart from context/API

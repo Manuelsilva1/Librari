@@ -271,9 +271,15 @@ export const createSale = async (saleData: CreateSalePayload): Promise<Sale> => 
   });
 };
 
-export const getUserSales = async (): Promise<Sale[]> => {
+export const getNextTicket = async (): Promise<{ nextTicket: number }> => {
+  if (API_MODE === 'mock') return mockApi.mockGetNextTicket();
+  return fetchApi<{ nextTicket: number }>('/api/ventas/next-ticket');
+};
+
+export const getUserSales = async (page = 0, size = 10): Promise<Sale[]> => {
   if (API_MODE === 'mock') return mockApi.mockGetUserSales();
-  return fetchApi<Sale[]>('/api/ventas');
+  const params = new URLSearchParams({ page: String(page), size: String(size) });
+  return fetchApi<Sale[]>(`/api/ventas?${params.toString()}`);
 };
 
 // getSaleById is missing from mock, adding simple one below

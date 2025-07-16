@@ -48,6 +48,7 @@ export default function SalesHistoryPage({ params }: SalesHistoryPageProps) {
   const { lang } = params;
   const { isAuthenticated, user, token } = useAuth();
   const [sales, setSales] = useState<Sale[]>([]);
+  const [page, setPage] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dictionary, setDictionary] = useState<Dictionary>(mockDictionary); // Use mock initially
@@ -80,7 +81,7 @@ export default function SalesHistoryPage({ params }: SalesHistoryPageProps) {
       setIsLoading(true);
       setError(null);
       try {
-        const userSales = await getUserSales();
+        const userSales = await getUserSales(page, 10);
         setSales(userSales);
       } catch (err) {
         const apiError = err as ApiResponseError;
@@ -92,7 +93,7 @@ export default function SalesHistoryPage({ params }: SalesHistoryPageProps) {
     };
 
     fetchSales();
-  }, [isAuthenticated, token, texts.error]); // Depend on token to re-fetch if user logs in/out
+  }, [isAuthenticated, token, texts.error, page]); // Depend on page and token
 
   if (!isAuthenticated) {
     return (
@@ -157,7 +158,7 @@ export default function SalesHistoryPage({ params }: SalesHistoryPageProps) {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>{texts.orderId}</TableHead>
+                    <TableHead>N.º Ticket</TableHead>
                     <TableHead>{texts.date}</TableHead>
                     <TableHead className="text-right">{texts.total}</TableHead>
                     <TableHead className="text-center">{texts.items}</TableHead>
@@ -167,7 +168,7 @@ export default function SalesHistoryPage({ params }: SalesHistoryPageProps) {
                 <TableBody>
                   {sales.map((sale) => (
                     <TableRow key={sale.id}>
-                      <TableCell className="font-medium">#{typeof sale.id === 'number' ? sale.id : String(sale.id).substring(0,8)}</TableCell>
+                      <TableCell className="font-medium">{sale.numeroTicket}</TableCell>
                       <TableCell>{new Date(sale.fecha).toLocaleDateString(lang, { year: 'numeric', month: 'long', day: 'numeric' })}</TableCell>
                       <TableCell className="text-right">UYU {sale.total.toFixed(2)}</TableCell>
                       <TableCell className="text-center">{sale.items.length}</TableCell>
@@ -184,6 +185,10 @@ export default function SalesHistoryPage({ params }: SalesHistoryPageProps) {
                 </TableBody>
               </Table>
             )}
+            <div className="flex justify-between mt-4">
+              <Button variant="outline" onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}>Anterior</Button>
+              <Button variant="outline" onClick={() => setPage(p => p + 1)}>Siguiente</Button>
+            </div>
           </CardContent>
         </Card>
       </div>
