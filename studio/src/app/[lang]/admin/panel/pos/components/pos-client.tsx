@@ -210,18 +210,15 @@ export function PosClient({ lang, dictionary, allBooks, posTexts }: PosClientPro
               <ScrollArea className="h-[300px] mb-4">
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>{posTexts.bookColumn}</TableHead>
+                    <TableRow><TableHead>{posTexts.bookColumn}</TableHead>
                       <TableHead className="text-right">{posTexts.priceColumn}</TableHead>
                       <TableHead className="text-center">{posTexts.quantityColumn}</TableHead>
                       <TableHead className="text-right">{posTexts.totalColumn}</TableHead>
-                      <TableHead className="text-center">{posTexts.actionsColumn}</TableHead>
-                    </TableRow>
+                      <TableHead className="text-center">{posTexts.actionsColumn}</TableHead></TableRow>
                   </TableHeader>
                   <TableBody>
                     {currentOrderItems.map(item => (
-                      <TableRow key={item.book.id}>
-                        <TableCell className="flex items-center space-x-2">
+                      <TableRow key={item.book.id}><TableCell className="flex items-center space-x-2">
                         <ImageWithFallback
                           src={getCoverImageUrl(item.book.coverImage)}
                           alt={item.book.titulo}
@@ -231,11 +228,11 @@ export function PosClient({ lang, dictionary, allBooks, posTexts }: PosClientPro
                           data-ai-hint="book cover order"
                         />
                           <div>
-                          <p className="font-medium truncate w-32" title={item.book.titulo}>{item.book.titulo}</p> 
-                          <p className="text-xs text-muted-foreground truncate w-32" title={item.book.autor}>{item.book.autor}</p> 
+                          <p className="font-medium truncate w-32" title={item.book.titulo}>{item.book.titulo}</p>
+                          <p className="text-xs text-muted-foreground truncate w-32" title={item.book.autor}>{item.book.autor}</p>
                           </div>
                         </TableCell>
-                      <TableCell className="text-right">UYU {item.book.precio.toFixed(2)}</TableCell> 
+                      <TableCell className="text-right">UYU {item.book.precio.toFixed(2)}</TableCell>
                         <TableCell className="text-center">
                           <div className="flex items-center justify-center space-x-1">
                             <Button variant="ghost" size="icon" onClick={() => updateOrderItemQuantity(item.book.id, -1)} className="h-6 w-6">
@@ -247,13 +244,12 @@ export function PosClient({ lang, dictionary, allBooks, posTexts }: PosClientPro
                             </Button>
                           </div>
                         </TableCell>
-                      <TableCell className="text-right">UYU {(item.book.precio * item.quantity).toFixed(2)}</TableCell> 
+                      <TableCell className="text-right">UYU {(item.book.precio * item.quantity).toFixed(2)}</TableCell>
                         <TableCell className="text-center">
                           <Button variant="ghost" size="icon" onClick={() => removeOrderItem(item.book.id)} className="text-destructive h-6 w-6">
                             <XCircle className="h-4 w-4" />
                           </Button>
-                        </TableCell>
-                      </TableRow>
+                        </TableCell></TableRow>
                     ))}
                   </TableBody>
                 </Table>

@@ -62,18 +62,15 @@ export function EditorialListClient({ editorials, onDeleteEditorial, lang, texts
         {editorials.length > 0 ? (
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>{texts.tableHeaderName || "Name"}</TableHead>
+              <TableRow><TableHead>{texts.tableHeaderName || "Name"}</TableHead>
                 <TableHead>{texts.tableHeaderRut || 'RUT'}</TableHead>
                 <TableHead>{texts.tableHeaderCelular || 'Cellphone'}</TableHead>
                 <TableHead>Website</TableHead>
-                <TableHead className="text-center">{texts.tableHeaderActions || "Actions"}</TableHead>
-              </TableRow>
+                <TableHead className="text-center">{texts.tableHeaderActions || "Actions"}</TableHead></TableRow>
             </TableHeader>
             <TableBody>
               {editorials.map((editorial) => (
-                <TableRow key={editorial.id}>
-                  <TableCell className="font-medium">{editorial.nombre}</TableCell> {/* Use nombre */}
+                <TableRow key={editorial.id}><TableCell className="font-medium">{editorial.nombre}</TableCell> {/* Use nombre */}
                   <TableCell>{editorial.rut || '-'}</TableCell>
                   <TableCell>{editorial.celular || '-'}</TableCell>
                   <TableCell>
@@ -93,8 +90,7 @@ export function EditorialListClient({ editorials, onDeleteEditorial, lang, texts
                     <Button variant="ghost" size="icon" title={texts.deleteButton || "Delete Publisher"} onClick={() => setEditorialToDelete(editorial)} disabled={!editorial.id}>
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
-                  </TableCell>
-                </TableRow>
+                  </TableCell></TableRow>
               ))}
             </TableBody>
           </Table>
