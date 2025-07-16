@@ -68,6 +68,7 @@ public class VentaController {
     }
 
     private Long getUserId(String nombre) {
-        return userRepository.findByEmail(nombre).orElseThrow().getId();
+        // Auth stores the username value, so search by username instead of email
+        return userRepository.findByUsername(nombre).orElseThrow().getId();
     }
 }
