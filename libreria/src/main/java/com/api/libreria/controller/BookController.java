@@ -103,8 +103,8 @@ public class BookController {
 
         existing.setTitulo(request.getTitulo());
         existing.setAutor(request.getAutor());
-        existing.setEditorial(request.getEditorial());
-        existing.setCategoria(request.getCategoria());
+        existing.setEditorialId(request.getEditorialId());
+        existing.setCategoriaId(request.getCategoriaId());
         existing.setPrecio(request.getPrecio());
         existing.setStock(request.getStock());
         existing.setDescripcion(request.getDescripcion());

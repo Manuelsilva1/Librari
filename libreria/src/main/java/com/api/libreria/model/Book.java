@@ -21,10 +21,12 @@ public class Book {
     private String titulo;
 
     private String autor;
+    
+    private String isbn;
 
-    private String editorial;
+    private String editorialId;
 
-    private String categoria;
+    private String categoriaId;
 
     private Double precio;
 
