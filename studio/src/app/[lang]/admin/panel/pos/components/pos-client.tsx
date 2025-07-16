@@ -42,6 +42,14 @@ export function PosClient({ lang, dictionary, allBooks, posTexts }: PosClientPro
   const [completedSale, setCompletedSale] = useState<Sale | null>(null); // Changed SaleRecord to Sale
   const [isTicketDialogOpen, setIsTicketDialogOpen] = useState(false);
 
+  const resetPosFields = () => {
+    setCurrentOrderItems([]);
+    setSearchTerm('');
+    setSearchResults([]);
+    setPaymentMethod('cash');
+    setCustomerName('');
+  };
+
   useEffect(() => {
     if (searchTerm.trim() === '') {
       setSearchResults([]);
@@ -123,13 +131,14 @@ export function PosClient({ lang, dictionary, allBooks, posTexts }: PosClientPro
     };
 
     try {
-      const createdSale = await createSale(salePayload); 
+      const createdSale = await createSale(salePayload);
       setCompletedSale(createdSale);
-      setIsTicketDialogOpen(true); 
+      setIsTicketDialogOpen(true);
       toast({
         title: posTexts.saleCompletedToastTitle,
         description: posTexts.saleCompletedToastDesc + ` Ticket: ${createdSale.numeroTicket}`,
       });
+      resetPosFields();
     } catch (error) {
       const apiError = error as ApiResponseError;
       console.error("Error completing sale:", apiError);
@@ -142,11 +151,7 @@ export function PosClient({ lang, dictionary, allBooks, posTexts }: PosClientPro
   const handleCloseTicketDialog = () => {
     setIsTicketDialogOpen(false);
     setCompletedSale(null);
-    setCurrentOrderItems([]);
-    setSearchTerm('');
-    setSearchResults([]);
-    setPaymentMethod('cash');
-    setCustomerName('');
+    resetPosFields();
   };
 
   return (
