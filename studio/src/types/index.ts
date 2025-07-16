@@ -132,6 +132,14 @@ export interface ApiResponseError {
   statusCode?: number;
 }
 
+export interface DashboardStats {
+  booksCount: number;
+  totalSales: number;
+  salesPercentageChange: number;
+  usersCount: number;
+  newUsersThisWeek: number;
+}
+
 
 // --- Potentially Unused Types (Review and Remove if Confirm Unused) ---
 // These types (GenAICartItem, GenAIAvailableOffer) seemed to be for mock data or a different feature.
