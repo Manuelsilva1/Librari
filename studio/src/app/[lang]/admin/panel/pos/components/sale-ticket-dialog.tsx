@@ -1,7 +1,7 @@
 
 "use client";
 
-import type { SaleRecord } from '@/types';
+import type { Sale } from '@/types';
 import type { Dictionary } from '@/types'; // Updated import
 import {
   AlertDialog,
@@ -21,7 +21,7 @@ import { Printer } from 'lucide-react';
 interface SaleTicketDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  saleRecord: SaleRecord | null;
+  saleRecord: Sale | null;
   dictionary: Dictionary;
 }
 
@@ -59,8 +59,8 @@ export function SaleTicketDialog({ isOpen, onClose, saleRecord, dictionary }: Sa
           <AlertDialogTitle className="font-headline text-2xl text-primary">{texts.title}</AlertDialogTitle>
           <AlertDialogDescription>
             {texts.saleId} <span className="font-mono text-xs">{saleRecord.id}</span><br/>
-            {texts.date} {new Date(saleRecord.timestamp).toLocaleString(dictionary.locale)}<br/>
-            {texts.customer} {saleRecord.customerName || texts.notApplicableShort}
+            {texts.date} {new Date(saleRecord.fecha).toLocaleString(dictionary.locale)}<br/>
+            {texts.customer} {saleRecord.usuarioId ?? texts.notApplicableShort}
           </AlertDialogDescription>
         </AlertDialogHeader>
         
@@ -70,9 +70,9 @@ export function SaleTicketDialog({ isOpen, onClose, saleRecord, dictionary }: Sa
           <div className="text-sm space-y-1">
             {saleRecord.items.map(item => (
               <div key={item.book.id} className="flex justify-between">
-                <span className="flex-1 truncate pr-1" title={item.book.title}>{item.book.title}</span>
-                <span className="w-8 text-center">x{item.quantity}</span>
-                <span className="w-16 text-right">UYU {(item.priceAtSale * item.quantity).toFixed(2)}</span>
+                <span className="flex-1 truncate pr-1" title={item.book.titulo}>{item.book.titulo}</span>
+                <span className="w-8 text-center">x{item.cantidad}</span>
+                <span className="w-16 text-right">UYU {(item.precioUnitario * item.cantidad).toFixed(2)}</span>
               </div>
             ))}
           </div>
@@ -83,17 +83,17 @@ export function SaleTicketDialog({ isOpen, onClose, saleRecord, dictionary }: Sa
         <div className="space-y-1 text-sm">
           <div className="flex justify-between">
             <span>{texts.subtotal}</span>
-            <span>UYU {saleRecord.totalAmount.toFixed(2)}</span> 
+              <span>UYU {saleRecord.total.toFixed(2)}</span>
           </div>
           <div className="flex justify-between font-bold text-md text-primary pt-1">
             <span>{texts.grandTotal}</span>
-            <span>UYU {saleRecord.totalAmount.toFixed(2)}</span>
+              <span>UYU {saleRecord.total.toFixed(2)}</span>
           </div>
         </div>
 
         <Separator className="my-3" />
         
-        <p className="text-sm">{texts.paymentMethod} {saleRecord.paymentMethod === 'cash' ? texts.cash : texts.card}</p>
+        <p className="text-sm">{texts.paymentMethod} {saleRecord.metodoPago === 'cash' ? texts.cash : texts.card}</p>
 
         <AlertDialogFooter className="mt-4">
           <Button variant="outline" onClick={onClose}>{texts.closeButton}</Button>
