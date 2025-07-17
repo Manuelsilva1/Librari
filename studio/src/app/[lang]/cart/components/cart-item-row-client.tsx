@@ -26,11 +26,10 @@ export function CartItemRowClient({ item, lang, dictionary }: CartItemRowClientP
   const bookDetails = item.libro; // The 'libro' field should contain book details
 
   const handleQuantityChange = async (newQuantity: number) => {
-    // Use libroId for cart actions since context functions expect it
     if (!item.libroId) return;
     setIsUpdating(true);
-    // Ensure newQuantity is at least 1, or handle removal if 0
-    const quantityToUpdate = Math.max(1, newQuantity);
+    const maxStock = bookDetails?.stock ?? newQuantity;
+    const quantityToUpdate = Math.max(1, Math.min(newQuantity, maxStock));
     await updateItemQuantity(item.libroId, quantityToUpdate);
     setIsUpdating(false);
   };
@@ -102,15 +101,14 @@ export function CartItemRowClient({ item, lang, dictionary }: CartItemRowClientP
             }}
             className="w-16 text-center h-10"
             min="1"
-            // max={bookDetails.stock} // Stock check should ideally be handled by API or disabled if not available
+            max={bookDetails?.stock}
             disabled={isUpdating || isCartLoading}
           />
           <Button 
             variant="outline" 
             size="icon" 
-            onClick={() => handleQuantityChange(item.cantidad + 1)} 
-            // disabled={item.cantidad >= bookDetails.stock || isUpdating || isCartLoading}  // Stock check
-            disabled={isUpdating || isCartLoading} 
+            onClick={() => handleQuantityChange(item.cantidad + 1)}
+            disabled={item.cantidad >= (bookDetails?.stock ?? Infinity) || isUpdating || isCartLoading}
           >
              {isUpdating && item.cantidad +1 === item.cantidad +1 ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
           </Button>
