@@ -1,7 +1,7 @@
 
 import { PublicLayout } from '@/components/layout/public-layout';
 // Import the new getBookById from API service
-import { getBookById, getBooks } from '@/services/api'; 
+import { getBookById, getBooks, getCategoryById } from '@/services/api';
 import { notFound } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 // Keep Category and Editorial types if you plan to fetch and display their names
@@ -46,10 +46,19 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
   const { id, lang } = params;
   const dictionary = await getDictionary(lang);
   let book: Book | null = null;
+  let categoryName: string | null = null;
   let fetchError: string | null = null;
 
   try {
     book = await getBookById(id);
+    if (book?.categoriaId) {
+      try {
+        const category = await getCategoryById(book.categoriaId);
+        categoryName = category.nombre;
+      } catch (catErr) {
+        console.error(`Failed to fetch category with ID ${book.categoriaId}:`, catErr);
+      }
+    }
   } catch (error: any) {
     console.error(`Failed to fetch book with ID ${id}:`, error);
     if (error.statusCode === 404 || error.status === 404) { // Check for error.status for fetch API errors
@@ -108,7 +117,11 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
             </p>
             
             <div className="flex items-center space-x-2">
-              {book.categoriaId && <Badge variant="secondary" className="text-sm px-3 py-1">Category ID: {book.categoriaId}</Badge>}
+              {book.categoriaId && (
+                <Badge variant="secondary" className="text-sm px-3 py-1">
+                  {categoryName || `Category ID: ${book.categoriaId}`}
+                </Badge>
+              )}
             </div>
 
             <p className="text-lg text-foreground/90 leading-relaxed">{book.descripcion || "No description available."}</p>

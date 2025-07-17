@@ -23,6 +23,13 @@ public class CategoriaController {
         return categoriaRepository.findAll(pageable);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Categoria> getById(@PathVariable Long id) {
+        return categoriaRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Categoria> create(@RequestBody Categoria categoria) {

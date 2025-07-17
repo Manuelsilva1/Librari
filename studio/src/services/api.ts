@@ -229,6 +229,11 @@ export const getCategories = async (
   return page.content;
 };
 
+export const getCategoryById = async (id: string | number): Promise<Category> => {
+  if (API_MODE === 'mock') return mockApi.mockGetCategoryById(id);
+  return fetchApi<Category>(`/api/categorias/${id}`);
+};
+
 export const createCategory = async (categoryData: Partial<Category>): Promise<Category> => {
   if (API_MODE === 'mock') return mockApi.mockCreateCategory(categoryData);
   return fetchApi<Category>('/api/categorias', {
