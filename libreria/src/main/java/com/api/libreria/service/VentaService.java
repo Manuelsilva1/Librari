@@ -150,11 +150,8 @@ public class VentaService  {
         double total = 0.0;
         for (PedidoItem item : pedido.getItems()) {
             Book book = item.getBook();
-            if (book.getStock() < item.getCantidad()) {
-                throw new RuntimeException("Stock insuficiente para: " + book.getTitulo());
-            }
-            book.setStock(book.getStock() - item.getCantidad());
-            bookRepository.save(book);
+
+            // El stock ya fue descontado al crear el pedido
 
             VentaItem ventaItem = new VentaItem();
             ventaItem.setVenta(venta);
