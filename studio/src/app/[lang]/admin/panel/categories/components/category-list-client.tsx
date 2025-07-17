@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import type { Category } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -30,6 +30,11 @@ export function CategoryListClient({ categories, onDeleteCategory, lang, texts }
   // Removed local categories state, directly use the prop 'categories'
   const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
   const { toast } = useToast();
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+
+  const totalPages = Math.ceil(categories.length / pageSize) || 1;
+  const pagedCategories = categories.slice((page - 1) * pageSize, page * pageSize);
 
   // No longer need useEffect to setCategories, as 'categories' prop will re-render the component
 
@@ -63,7 +68,8 @@ export function CategoryListClient({ categories, onDeleteCategory, lang, texts }
         </div>
 
         {categories.length > 0 ? (
-          <Table>
+          <>
+            <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>{texts.tableHeaderName || "Name"}</TableHead>
@@ -72,7 +78,7 @@ export function CategoryListClient({ categories, onDeleteCategory, lang, texts }
               </TableRow>
             </TableHeader>
             <TableBody>
-              {categories.map((category) => (
+              {pagedCategories.map((category) => (
                 <TableRow key={category.id}>
                   <TableCell className="font-medium">{category.nombre}</TableCell> {/* Use nombre */}
                   <TableCell className="hidden md:table-cell text-sm text-muted-foreground truncate max-w-xs">
@@ -91,7 +97,31 @@ export function CategoryListClient({ categories, onDeleteCategory, lang, texts }
                 </TableRow>
               ))}
             </TableBody>
-          </Table>
+            </Table>
+            <div className="flex justify-between items-center mt-4">
+              <p className="text-sm text-muted-foreground">
+                Page {page} of {totalPages}
+              </p>
+              <div className="space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page === 1}
+                  onClick={() => setPage((p) => p - 1)}
+                >
+                  Prev
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page === totalPages}
+                  onClick={() => setPage((p) => p + 1)}
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+          </>
         ) : (
           <div className="text-center py-10 border rounded-md">
             <Tags className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
