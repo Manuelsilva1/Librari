@@ -44,9 +44,16 @@ public class PedidoService {
         if (request.getItems() != null) {
             var items = new ArrayList<PedidoItem>();
             for (CreatePedidoItemRequest itemReq : request.getItems()) {
+                Book book = bookRepository.findById(itemReq.getLibroId()).orElseThrow();
+                if (book.getStock() < itemReq.getCantidad()) {
+                    throw new RuntimeException("Stock insuficiente para: " + book.getTitulo());
+                }
+                book.setStock(book.getStock() - itemReq.getCantidad());
+                bookRepository.save(book);
+
                 PedidoItem item = new PedidoItem();
                 item.setPedido(pedido);
-                item.setBook(bookRepository.findById(itemReq.getLibroId()).orElseThrow());
+                item.setBook(book);
                 item.setCantidad(itemReq.getCantidad());
                 items.add(pedidoItemRepository.save(item));
             }
