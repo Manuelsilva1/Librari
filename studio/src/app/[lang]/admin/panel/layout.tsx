@@ -96,6 +96,7 @@ async function AdminPanelSidebarNav({ lang, dictionary }: { lang: string, dictio
         { href: `/admin/panel/categories`, icon: Tags, label: sidebarTexts.manageCategories },
         { href: `/admin/panel/editorials`, icon: Building2, label: sidebarTexts.manageEditorials },
         { href: `/admin/panel/pos`, icon: Store, label: sidebarTexts.pointOfSale },
+        { href: `/admin/panel/orders`, icon: Receipt, label: sidebarTexts.orders },
         { href: `/admin/panel/sales`, icon: Receipt, label: sidebarTexts.sales },
         { href: `/admin/panel/stats`, icon: BarChart3, label: sidebarTexts.statistics },
         { href: `/admin/panel/reports`, icon: FileSpreadsheet, label: sidebarTexts.reports },

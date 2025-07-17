@@ -1,0 +1,64 @@
+package com.api.libreria.service;
+
+import com.api.libreria.model.*;
+import com.api.libreria.repository.*;
+import com.api.libreria.dto.CreatePedidoItemRequest;
+import com.api.libreria.dto.CreatePedidoRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+
+@Service
+public class PedidoService {
+    private final PedidoRepository pedidoRepository;
+    private final PedidoItemRepository pedidoItemRepository;
+    private final BookRepository bookRepository;
+
+    public PedidoService(PedidoRepository pedidoRepository,
+                         PedidoItemRepository pedidoItemRepository,
+                         BookRepository bookRepository) {
+        this.pedidoRepository = pedidoRepository;
+        this.pedidoItemRepository = pedidoItemRepository;
+        this.bookRepository = bookRepository;
+    }
+
+    @Transactional
+    public Pedido crearPedido(CreatePedidoRequest request) {
+        Pedido pedido = new Pedido();
+        pedido.setNombre(request.getNombre());
+        pedido.setEmail(request.getEmail());
+        pedido.setDireccion(request.getDireccion());
+        pedido.setCiudad(request.getCiudad());
+        pedido.setEstado(request.getEstado());
+        pedido.setZip(request.getZip());
+        pedido.setFecha(LocalDateTime.now());
+        pedido.setStatus("PENDING");
+        pedido = pedidoRepository.save(pedido);
+
+        if (request.getItems() != null) {
+            var items = new ArrayList<PedidoItem>();
+            for (CreatePedidoItemRequest itemReq : request.getItems()) {
+                PedidoItem item = new PedidoItem();
+                item.setPedido(pedido);
+                item.setBook(bookRepository.findById(itemReq.getLibroId()).orElseThrow());
+                item.setCantidad(itemReq.getCantidad());
+                items.add(pedidoItemRepository.save(item));
+            }
+            pedido.setItems(items);
+        }
+        return pedidoRepository.save(pedido);
+    }
+
+    public java.util.List<Pedido> getAllPedidos() {
+        return pedidoRepository.findAll();
+    }
+
+    @Transactional
+    public Pedido actualizarEstado(Long id, String status) {
+        Pedido p = pedidoRepository.findById(id).orElseThrow();
+        p.setStatus(status);
+        return pedidoRepository.save(p);
+    }
+}
