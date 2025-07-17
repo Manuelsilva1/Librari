@@ -129,6 +129,10 @@ export interface Pedido {
   zip: string;
   fecha: string;
   status: string;
+  /** Optional payment method, may be null if not defined */
+  metodoPago?: string;
+  /** Optional history of status changes */
+  historial?: { status: string; fecha: string }[];
   items: PedidoItem[];
 }
 
