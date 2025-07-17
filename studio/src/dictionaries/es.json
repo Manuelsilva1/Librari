@@ -346,7 +346,12 @@
       "title": "Pedidos",
       "customerName": "Cliente",
       "approve": "Aprobar",
-      "cancel": "Cancelar"
+      "cancel": "Cancelar",
+      "viewDetails": "Ver Detalles",
+      "closeButton": "Cerrar",
+      "items": "Artículos",
+      "status": "Estado",
+      "updateStatus": "Actualizar Estado"
     },
     "statsPage": {
       "title": "Estadísticas de Ventas",

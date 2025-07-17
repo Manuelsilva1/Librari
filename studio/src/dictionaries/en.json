@@ -346,7 +346,12 @@
       "title": "Orders",
       "customerName": "Customer",
       "approve": "Approve",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "viewDetails": "View Details",
+      "closeButton": "Close",
+      "items": "Items",
+      "status": "Status",
+      "updateStatus": "Update Status"
     },
     "statsPage": {
       "title": "Sales Statistics",
