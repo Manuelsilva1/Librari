@@ -2,6 +2,7 @@ package com.api.libreria.service;
 
 import com.api.libreria.model.*;
 import com.api.libreria.repository.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import com.api.libreria.dto.CreatePedidoItemRequest;
 import com.api.libreria.dto.CreatePedidoRequest;
 import org.springframework.stereotype.Service;
@@ -16,19 +17,35 @@ public class PedidoService {
     private final PedidoItemRepository pedidoItemRepository;
     private final BookRepository bookRepository;
     private final VentaService ventaService;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public PedidoService(PedidoRepository pedidoRepository,
                          PedidoItemRepository pedidoItemRepository,
                          BookRepository bookRepository,
-                         VentaService ventaService) {
+                         VentaService ventaService,
+                         UserRepository userRepository,
+                         PasswordEncoder passwordEncoder) {
         this.pedidoRepository = pedidoRepository;
         this.pedidoItemRepository = pedidoItemRepository;
         this.bookRepository = bookRepository;
         this.ventaService = ventaService;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
     public Pedido crearPedido(CreatePedidoRequest request) {
+        // Create or fetch user based on email
+        userRepository.findByEmail(request.getEmail()).orElseGet(() -> {
+            User newUser = new User();
+            newUser.setUsername(request.getNombre());
+            newUser.setEmail(request.getEmail());
+            newUser.setPassword(passwordEncoder.encode(java.util.UUID.randomUUID().toString()));
+            newUser.setRole("USER");
+            return userRepository.save(newUser);
+        });
+
         Pedido pedido = new Pedido();
         pedido.setNombre(request.getNombre());
         pedido.setEmail(request.getEmail());
