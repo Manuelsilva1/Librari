@@ -7,6 +7,7 @@ import lombok.Data;
 public class CreatePedidoRequest {
     private String nombre;
     private String email;
+    private String celular;
     private String direccion;
     private String ciudad;
     private String estado;

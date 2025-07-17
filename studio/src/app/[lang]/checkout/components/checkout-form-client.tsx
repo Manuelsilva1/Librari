@@ -26,7 +26,7 @@ const checkoutSchema = z.object({
   city: z.string().min(2, "City is required"),
   state: z.string().min(2, "State is required"),
   zip: z.string().min(5, "ZIP code is required").regex(/^\d{5}(-\d{4})?$/, "Invalid ZIP code format"),
-  paymentMethod: z.string().min(1, "Payment method is required (e.g. Credit Card, PayPal)"),
+  celular: z.string().min(5, "Cellphone is required"),
 });
 
 type CheckoutFormData = z.infer<typeof checkoutSchema>;
@@ -61,9 +61,8 @@ export function CheckoutFormClient({ lang, dictionary }: CheckoutFormClientProps
     statePlaceholder: "CA",
     zipLabel: "ZIP / Postal Code",
     zipPlaceholder: "90210",
-    paymentMethodLabel: "Payment Method",
-    paymentMethodPlaceholder: "e.g. Credit Card ending in 1234",
-    paymentMethodDescription: "For demo purposes, any text is accepted.",
+    celularLabel: "Cellphone",
+    celularPlaceholder: "e.g., 912345678",
     placeOrder: "Place Order",
     orderSubmittedTitle: "Order Submitted!",
     orderSubmittedDescription: "Thank you for your purchase. Your order is being processed (simulated).",
@@ -87,7 +86,7 @@ export function CheckoutFormClient({ lang, dictionary }: CheckoutFormClientProps
       city: '',
       state: '',
       zip: '',
-      paymentMethod: 'Credit Card (Simulated)', 
+      celular: '',
     },
   });
   
@@ -101,7 +100,7 @@ export function CheckoutFormClient({ lang, dictionary }: CheckoutFormClientProps
         city: form.getValues().city,
         state: form.getValues().state,
         zip: form.getValues().zip,
-        paymentMethod: form.getValues().paymentMethod,
+        celular: form.getValues().celular,
       });
     }
   }, [user, form]);
@@ -135,6 +134,7 @@ export function CheckoutFormClient({ lang, dictionary }: CheckoutFormClientProps
         ciudad: data.city,
         estado: data.state,
         zip: data.zip,
+        celular: data.celular,
         items,
       };
 
@@ -272,14 +272,13 @@ export function CheckoutFormClient({ lang, dictionary }: CheckoutFormClientProps
                   </FormItem>
               )} />
             </div>
-             <FormField control={form.control} name="paymentMethod" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{texts.paymentMethodLabel}</FormLabel>
-                    <FormControl><Input placeholder={texts.paymentMethodPlaceholder} {...field} /></FormControl>
-                     <FormMessage />
-                    <p className="text-xs text-muted-foreground">{texts.paymentMethodDescription}</p>
-                  </FormItem>
-              )} />
+            <FormField control={form.control} name="celular" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{texts.celularLabel}</FormLabel>
+                  <FormControl><Input placeholder={texts.celularPlaceholder} {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+            )} />
           </CardContent>
           <CardFooter className="flex flex-col items-stretch">
             <Button type="submit" size="lg" disabled={isSubmitting || isCartLoadingHook} className="w-full font-headline text-lg">

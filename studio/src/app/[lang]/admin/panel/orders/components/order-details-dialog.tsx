@@ -37,6 +37,12 @@ interface OrderDetailsDialogProps {
 export function OrderDetailsDialog({ order, onClose, texts, onStatusUpdated }: OrderDetailsDialogProps) {
   const [status, setStatus] = useState(order?.status || 'PENDING');
 
+  const statusClasses: Record<string, string> = {
+    PENDING: 'text-yellow-600',
+    APPROVED: 'text-green-600',
+    CANCELLED: 'text-red-600',
+  };
+
   if (!order) return null;
 
   const handleUpdate = async () => {
@@ -56,7 +62,9 @@ export function OrderDetailsDialog({ order, onClose, texts, onStatusUpdated }: O
         <div className="space-y-1 text-sm mt-2">
           <p><strong>ID:</strong> {order.id}</p>
           <p><strong>{texts.customerName || 'Customer'}:</strong> {order.nombre} ({order.email})</p>
+          <p><strong>Celular:</strong> {order.celular}</p>
           <p><strong>Address:</strong> {order.direccion}, {order.ciudad}, {order.estado} {order.zip}</p>
+          <p><strong>{texts.status || 'Status'}:</strong> <span className={statusClasses[order.status] || ''}>{order.status}</span></p>
         </div>
         <div className="mt-4">
           <h4 className="font-semibold mb-2">{texts.items || 'Items'}</h4>

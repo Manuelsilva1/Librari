@@ -32,6 +32,7 @@ public class PedidoService {
         Pedido pedido = new Pedido();
         pedido.setNombre(request.getNombre());
         pedido.setEmail(request.getEmail());
+        pedido.setCelular(request.getCelular());
         pedido.setDireccion(request.getDireccion());
         pedido.setCiudad(request.getCiudad());
         pedido.setEstado(request.getEstado());
