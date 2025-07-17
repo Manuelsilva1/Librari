@@ -39,7 +39,7 @@ interface CheckoutFormClientProps {
 export function CheckoutFormClient({ lang, dictionary }: CheckoutFormClientProps) {
   // Use the new cart structure from useCart
   const { cart, getCartTotal, clearCart: clearCartContextAction, isLoading: isCartLoadingHook, error: cartErrorHook } = useCart(); 
-  const { isAuthenticated, user } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false); // Renamed isLoading to isSubmitting for clarity
   const [isOrderSubmitted, setIsOrderSubmitted] = useState(false);
@@ -107,13 +107,6 @@ export function CheckoutFormClient({ lang, dictionary }: CheckoutFormClientProps
 
   const onSubmit: SubmitHandler<CheckoutFormData> = async (data) => {
     setSubmissionError(null);
-    if (!isAuthenticated) {
-      setSubmissionError("You must be logged in to place an order.");
-      toast({ title: "Authentication Error", description: "Please log in to continue.", variant: "destructive" });
-      // Optionally redirect to login: router.push(`/${lang}/login`);
-      return;
-    }
-
     if (!cart || cart.items.length === 0) {
       setSubmissionError("Your cart is empty.");
       toast({ title: "Empty Cart", description: "Cannot place an order with an empty cart.", variant: "destructive" });
