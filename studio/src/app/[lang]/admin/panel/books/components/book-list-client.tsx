@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { ImageWithFallback } from '@/components/image-with-fallback';
 import { getCoverImageUrl } from '@/lib/utils';
 import Link from 'next/link';
@@ -32,12 +32,14 @@ interface BookListClientProps {
 export function BookListClient({ books, onDeleteBook, lang }: BookListClientProps) {
   // Removed local books state, directly use the prop 'books' as it's managed by parent
   const [searchTerm, setSearchTerm] = useState('');
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
   const [bookToDelete, setBookToDelete] = useState<Book | null>(null);
   const { toast } = useToast();
 
-  // No longer need useEffect to setBooks, as 'books' prop will re-render the component
+  // Books list comes from parent component; no local state needed
 
-  const filteredBooks = books.filter(book => 
+  const filteredBooks = books.filter(book =>
     book.titulo.toLowerCase().includes(searchTerm.toLowerCase()) || // Use titulo
     book.autor.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (book.isbn && book.isbn.toLowerCase().includes(searchTerm.toLowerCase())) || // Search by ISBN
@@ -46,6 +48,8 @@ export function BookListClient({ books, onDeleteBook, lang }: BookListClientProp
     // For now, let's keep it simple or remove category from simple search.
     (book.categoriaId && String(book.categoriaId).toLowerCase().includes(searchTerm.toLowerCase()))
   );
+  const totalPages = Math.ceil(filteredBooks.length / pageSize) || 1;
+  const pagedBooks = filteredBooks.slice((page - 1) * pageSize, page * pageSize);
 
   const handleDeleteConfirmation = async () => {
     if (bookToDelete && bookToDelete.id) { // Ensure ID exists
@@ -72,7 +76,7 @@ export function BookListClient({ books, onDeleteBook, lang }: BookListClientProp
               type="text"
               placeholder="Search books..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
               className="pl-10"
             />
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -99,7 +103,7 @@ export function BookListClient({ books, onDeleteBook, lang }: BookListClientProp
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredBooks.map((book) => (
+              {pagedBooks.map((book) => (
                 <TableRow key={book.id}>
                   <TableCell>
                     <ImageWithFallback
@@ -138,6 +142,17 @@ export function BookListClient({ books, onDeleteBook, lang }: BookListClientProp
               ))}
             </TableBody>
           </Table>
+          <div className="flex justify-between items-center mt-4">
+            <p className="text-sm text-muted-foreground">Page {page} of {totalPages}</p>
+            <div className="space-x-2">
+              <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(p => p - 1)}>
+                Prev
+              </Button>
+              <Button variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage(p => p + 1)}>
+                Next
+              </Button>
+            </div>
+          </div>
         ) : (
           <div className="text-center py-10 border rounded-md">
             <p className="text-muted-foreground">No books found matching your search criteria.</p>
