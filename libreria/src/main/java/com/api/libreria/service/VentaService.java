@@ -144,7 +144,7 @@ public class VentaService  {
         Venta venta = new Venta();
         venta.setNumeroTicket(numeroTicket);
         venta.setFecha(LocalDateTime.now());
-        venta.setMetodoPago("Pedido");
+        venta.setMetodoPago("Acordado con el cliente");
         venta = ventaRepository.save(venta);
 
         double total = 0.0;

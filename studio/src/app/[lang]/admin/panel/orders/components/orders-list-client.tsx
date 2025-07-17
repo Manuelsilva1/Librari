@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from 'react';
-import { getAdminPedidos, updatePedidoStatus } from '@/services/api';
+import { getAdminPedidos } from '@/services/api';
 import type { Pedido } from '@/types';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
@@ -23,15 +23,6 @@ export function OrdersListClient({ texts }: { texts: any }) {
 
   useEffect(() => { load(); }, []);
 
-  const handleApprove = async (id: number | string) => {
-    await updatePedidoStatus(id, 'APPROVED');
-    await load();
-  };
-
-  const handleCancel = async (id: number | string) => {
-    await updatePedidoStatus(id, 'CANCELLED');
-    await load();
-  };
 
   if (loading) return <p>Loading...</p>;
   if (orders.length === 0) return <p>No orders found.</p>;
@@ -53,16 +44,10 @@ export function OrdersListClient({ texts }: { texts: any }) {
               <TableCell>{o.id}</TableCell>
               <TableCell>{o.nombre}</TableCell>
               <TableCell>{o.status}</TableCell>
-              <TableCell className="space-x-2">
+              <TableCell>
                 <Button variant="outline" size="sm" onClick={() => setSelectedOrder(o)}>
                   {texts?.viewDetails || 'View Details'}
                 </Button>
-                {o.status !== 'APPROVED' && (
-                  <Button size="sm" onClick={() => handleApprove(o.id)}>{texts?.approve || 'Approve'}</Button>
-                )}
-                {o.status !== 'CANCELLED' && (
-                  <Button variant="destructive" size="sm" onClick={() => handleCancel(o.id)}>{texts?.cancel || 'Cancel'}</Button>
-                )}
               </TableCell>
             </TableRow>
           ))}

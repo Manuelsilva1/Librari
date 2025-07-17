@@ -122,6 +122,7 @@ export interface Pedido {
   id: number | string;
   nombre: string;
   email: string;
+  celular: string;
   direccion: string;
   ciudad: string;
   estado: string;
@@ -139,6 +140,7 @@ export interface CreatePedidoItemPayload {
 export interface CreatePedidoPayload {
   nombre: string;
   email: string;
+  celular: string;
   direccion: string;
   ciudad: string;
   estado: string;
