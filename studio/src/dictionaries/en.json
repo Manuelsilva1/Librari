@@ -344,7 +344,9 @@
     },
     "ordersPage": {
       "title": "Orders",
-      "customerName": "Customer"
+      "customerName": "Customer",
+      "approve": "Approve",
+      "cancel": "Cancel"
     },
     "statsPage": {
       "title": "Sales Statistics",

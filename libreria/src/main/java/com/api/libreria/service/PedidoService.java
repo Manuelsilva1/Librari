@@ -15,13 +15,16 @@ public class PedidoService {
     private final PedidoRepository pedidoRepository;
     private final PedidoItemRepository pedidoItemRepository;
     private final BookRepository bookRepository;
+    private final VentaService ventaService;
 
     public PedidoService(PedidoRepository pedidoRepository,
                          PedidoItemRepository pedidoItemRepository,
-                         BookRepository bookRepository) {
+                         BookRepository bookRepository,
+                         VentaService ventaService) {
         this.pedidoRepository = pedidoRepository;
         this.pedidoItemRepository = pedidoItemRepository;
         this.bookRepository = bookRepository;
+        this.ventaService = ventaService;
     }
 
     @Transactional
@@ -59,6 +62,10 @@ public class PedidoService {
     public Pedido actualizarEstado(Long id, String status) {
         Pedido p = pedidoRepository.findById(id).orElseThrow();
         p.setStatus(status);
-        return pedidoRepository.save(p);
+        Pedido saved = pedidoRepository.save(p);
+        if ("APPROVED".equalsIgnoreCase(status)) {
+            ventaService.crearVentaDesdePedido(saved);
+        }
+        return saved;
     }
 }
