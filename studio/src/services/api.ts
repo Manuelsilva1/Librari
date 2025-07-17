@@ -1,6 +1,20 @@
 
 import { getAuthHeaders, dispatchLogoutEvent } from '@/lib/auth-utils';
-import type { Book, Category, Editorial, User, Cart, Sale, Offer, CreateSalePayload, CreateOfferPayload, ApiResponseError, DashboardStats } from '@/types';
+import type {
+  Book,
+  Category,
+  Editorial,
+  User,
+  Cart,
+  Sale,
+  Offer,
+  CreateSalePayload,
+  CreateOfferPayload,
+  ApiResponseError,
+  DashboardStats,
+  Pedido,
+  CreatePedidoPayload,
+} from '@/types';
 
 // Import mock functions
 import * as mockApi from '@/lib/mock-data';
@@ -339,6 +353,25 @@ export const getAdminSales = async (): Promise<Sale[]> => {
 export const getAdminSaleById = async (saleId: string | number): Promise<Sale> => {
   if (API_MODE === 'mock') return mockApi.mockGetAdminSaleById(saleId);
   return fetchApi<Sale>(`/api/ventas/admin/${saleId}`);
+};
+
+// --- Orders ---
+export const createPedido = async (payload: CreatePedidoPayload): Promise<Pedido> => {
+  return fetchApi<Pedido>('/api/pedidos', {
+    method: 'POST',
+    body: payload,
+  });
+};
+
+export const getAdminPedidos = async (): Promise<Pedido[]> => {
+  return fetchApi<Pedido[]>('/api/pedidos');
+};
+
+export const updatePedidoStatus = async (id: string | number, status: string): Promise<Pedido> => {
+  return fetchApi<Pedido>(`/api/pedidos/${id}/status`, {
+    method: 'PUT',
+    body: { status },
+  });
 };
 
 export const getAdminSaleInvoice = async (saleId: string | number): Promise<string> => {

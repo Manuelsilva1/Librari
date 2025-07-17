@@ -111,6 +111,41 @@ export interface CreateSalePayload {
   // totalAmount?: number; // Backend might recalculate this for security
 }
 
+export interface PedidoItem {
+  id?: number | string;
+  libroId?: number | string;
+  cantidad: number;
+  libro?: Book;
+}
+
+export interface Pedido {
+  id: number | string;
+  nombre: string;
+  email: string;
+  direccion: string;
+  ciudad: string;
+  estado: string;
+  zip: string;
+  fecha: string;
+  status: string;
+  items: PedidoItem[];
+}
+
+export interface CreatePedidoItemPayload {
+  libroId: number | string;
+  cantidad: number;
+}
+
+export interface CreatePedidoPayload {
+  nombre: string;
+  email: string;
+  direccion: string;
+  ciudad: string;
+  estado: string;
+  zip: string;
+  items: CreatePedidoItemPayload[];
+}
+
 export interface Offer {
   id: number | string;
   descripcion: string;
@@ -287,11 +322,12 @@ export type Dictionary = {
       manageUsers: string;
       statusSoon: string;
       pointOfSale: string;
+      orders: string;
       sales: string;
       manageEditorials: string;
       manageCategories: string;
       statistics: string;
-      reports: string; 
+      reports: string;
     };
     header: {
       titleSuffix: string;
@@ -464,6 +500,10 @@ export type Dictionary = {
         may: string; june: string; july: string; august: string;
         september: string; october: string; november: string; december: string;
       };
+    };
+    ordersPage: {
+      title: string;
+      customerName: string;
     };
     statsPage: {
       title: string;

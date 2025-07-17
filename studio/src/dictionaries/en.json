@@ -131,6 +131,7 @@
         "manageUsers": "Manage Users",
         "statusSoon": "(Soon)",
         "pointOfSale": "Point of Sale",
+        "orders": "Orders",
         "sales": "Sales",
         "manageEditorials": "Manage Publishers",
         "manageCategories": "Manage Categories",
@@ -340,6 +341,10 @@
         "november": "November",
         "december": "December"
       }
+    },
+    "ordersPage": {
+      "title": "Orders",
+      "customerName": "Customer"
     },
     "statsPage": {
       "title": "Sales Statistics",

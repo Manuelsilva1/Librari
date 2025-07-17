@@ -7,8 +7,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useCart } from '@/hooks/use-cart';
 import { useAuth } from '@/context/auth-provider'; // Import useAuth
-import { createSale, getNextTicket } from '@/services/api'; // Import createSale
-import type { CreateSalePayload, CreateSaleItemPayload, ApiResponseError } from '@/types'; // Import necessary types
+import { createPedido } from '@/services/api';
+import type { CreatePedidoPayload, CreatePedidoItemPayload, ApiResponseError } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation'; // Import useRouter
@@ -123,35 +123,33 @@ export function CheckoutFormClient({ lang, dictionary }: CheckoutFormClientProps
 
     setIsSubmitting(true);
     try {
-      const saleItems: CreateSaleItemPayload[] = cart.items.map(item => ({
+      const items: CreatePedidoItemPayload[] = cart.items.map(item => ({
         libroId: item.libroId,
         cantidad: item.cantidad,
-        precioUnitario: item.precioUnitario,
       }));
 
-      const next = await getNextTicket();
-
-      const salePayload: CreateSalePayload = {
-        items: saleItems,
-        paymentMethod: data.paymentMethod, // From form
-        numeroTicket: next.nextTicket,
-        // Add other fields from 'data' if needed by your backend for CreateSalePayload
-        // e.g. customerName: data.name, shippingAddress: `${data.address}, ${data.city}, ${data.state} ${data.zip}`
-        // For now, keeping it simple as per defined CreateSalePayload
+      const payload: CreatePedidoPayload = {
+        nombre: data.name,
+        email: data.email,
+        direccion: data.address,
+        ciudad: data.city,
+        estado: data.state,
+        zip: data.zip,
+        items,
       };
-      
-      const createdSale = await createSale(salePayload);
+
+      const created = await createPedido(payload);
       
       toast({
         title: texts.orderSubmittedToast,
-        description: `${texts.orderSubmittedToastDesc} Ticket: ${createdSale.numeroTicket}`,
+        description: texts.orderSubmittedToastDesc,
       });
-      
+
       await clearCartContextAction(); // Clear cart from context/API
       setIsOrderSubmitted(true); // Show success screen
       form.reset(); 
       // Redirect to a success page, possibly with the sale ID
-      router.push(`/${lang}/checkout/success?orderId=${createdSale.id}`);
+      router.push(`/${lang}/checkout/success?orderId=${created.id}`);
 
     } catch (error) {
       const apiError = error as ApiResponseError;

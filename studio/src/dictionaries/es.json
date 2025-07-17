@@ -131,6 +131,7 @@
         "manageUsers": "Gestionar Usuarios",
         "statusSoon": "(Pronto)",
         "pointOfSale": "Punto de Venta",
+        "orders": "Pedidos",
         "sales": "Ventas",
         "manageEditorials": "Gestionar Editoriales",
         "manageCategories": "Gestionar Categorías",
@@ -340,6 +341,10 @@
         "november": "Noviembre",
         "december": "Diciembre"
       }
+    },
+    "ordersPage": {
+      "title": "Pedidos",
+      "customerName": "Cliente"
     },
     "statsPage": {
       "title": "Estadísticas de Ventas",
