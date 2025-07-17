@@ -130,6 +130,11 @@ export const mockDeleteBook = async (id: string | number): Promise<void> => {
 
 // Categories
 export const mockGetCategories = async (): Promise<Category[]> => simulateApiDelay([...mockCategoriesStore]);
+export const mockGetCategoryById = async (id: string | number): Promise<Category> => {
+  const category = mockCategoriesStore.find(c => String(c.id) === String(id));
+  if (category) return simulateApiDelay(category);
+  throw simulateApiError('Category not found', 404);
+};
 export const mockCreateCategory = async (catData: Partial<Category>): Promise<Category> => {
   const newCategory: Category = { id: generateId(), nombre: catData.nombre || 'Nueva Categoría', ...catData };
   mockCategoriesStore.push(newCategory);
