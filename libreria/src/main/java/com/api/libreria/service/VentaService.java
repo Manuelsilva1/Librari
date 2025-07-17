@@ -137,6 +137,40 @@ public class VentaService  {
         return venta;
     }
 
+    @Transactional
+    public Venta crearVentaDesdePedido(Pedido pedido) {
+        Integer numeroTicket = getNextTicket();
+
+        Venta venta = new Venta();
+        venta.setNumeroTicket(numeroTicket);
+        venta.setFecha(LocalDateTime.now());
+        venta.setMetodoPago("Pedido");
+        venta = ventaRepository.save(venta);
+
+        double total = 0.0;
+        for (PedidoItem item : pedido.getItems()) {
+            Book book = item.getBook();
+            if (book.getStock() < item.getCantidad()) {
+                throw new RuntimeException("Stock insuficiente para: " + book.getTitulo());
+            }
+            book.setStock(book.getStock() - item.getCantidad());
+            bookRepository.save(book);
+
+            VentaItem ventaItem = new VentaItem();
+            ventaItem.setVenta(venta);
+            ventaItem.setBook(book);
+            ventaItem.setCantidad(item.getCantidad());
+            ventaItem.setPrecioUnitario(book.getPrecio());
+            ventaItemRepository.save(ventaItem);
+
+            total += item.getCantidad() * book.getPrecio();
+        }
+
+        venta.setTotal(total);
+        ventaRepository.save(venta);
+        return venta;
+    }
+
     public List<Venta> getAllVentas() {
         return ventaRepository.findAll();
     }

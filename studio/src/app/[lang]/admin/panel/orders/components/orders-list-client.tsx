@@ -26,6 +26,11 @@ export function OrdersListClient({ texts }: { texts: any }) {
     await load();
   };
 
+  const handleCancel = async (id: number | string) => {
+    await updatePedidoStatus(id, 'CANCELLED');
+    await load();
+  };
+
   if (loading) return <p>Loading...</p>;
   if (orders.length === 0) return <p>No orders found.</p>;
 
@@ -45,9 +50,12 @@ export function OrdersListClient({ texts }: { texts: any }) {
             <TableCell>{o.id}</TableCell>
             <TableCell>{o.nombre}</TableCell>
             <TableCell>{o.status}</TableCell>
-            <TableCell>
+            <TableCell className="space-x-2">
               {o.status !== 'APPROVED' && (
-                <Button size="sm" onClick={() => handleApprove(o.id)}>Approve</Button>
+                <Button size="sm" onClick={() => handleApprove(o.id)}>{texts?.approve || 'Approve'}</Button>
+              )}
+              {o.status !== 'CANCELLED' && (
+                <Button variant="destructive" size="sm" onClick={() => handleCancel(o.id)}>{texts?.cancel || 'Cancel'}</Button>
               )}
             </TableCell>
           </TableRow>
