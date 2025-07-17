@@ -43,22 +43,21 @@ public class BookController {
     ) throws IOException {
 
         if (file != null && !file.isEmpty()) {
+            // ✨ Ruta absoluta definida por ti
+            Path dir = Paths.get("C:\\Users\\manue\\OneDrive\\Documentos\\Desarrollo\\librari\\libreria\\uploads");
+            Files.createDirectories(dir);
 
-            /* 1. Carpeta donde vive el .jar (o la clase Main si corres con mvn spring-boot:run) */
-            ApplicationHome home = new ApplicationHome(getClass());
-            Path jarDir = home.getDir().toPath();          // …/mi-app.jar  →  …/
-
-            /* 2. Subcarpeta “uploads” dentro de ese directorio */
-            Path dir = jarDir.resolve("uploads");
-            Files.createDirectories(dir);                  // la crea si no existe
-
-            /* 3. Nombre único y guardado */
             String fileName = UUID.randomUUID() + "-" + file.getOriginalFilename();
             Path path = dir.resolve(fileName);
+
             file.transferTo(path);
 
-            /* 4. Guarda la URL relativa para que el frontend la pida luego */
+            System.out.println("Archivo guardado en: " + path.toAbsolutePath());
+
+            // Guarda la ruta absoluta
             request.setCoverImage("/uploads/" + fileName);
+        } else {
+            System.out.println("No vino ningún archivo");
         }
 
         Book saved = bookRepository.save(request);

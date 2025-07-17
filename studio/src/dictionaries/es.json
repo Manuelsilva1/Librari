@@ -84,8 +84,8 @@
     "themesPrefix": "Temas"
   },
   "checkoutForm": {
-    "secureCheckout": "Pago Seguro",
-    "fillDetails": "Por favor, completa tus datos para finalizar la compra. Total: UYU {total}",
+    "secureCheckout": "Registro De Pedido",
+    "fillDetails": "Por favor, completa tus datos para finalizar el pedido. El mismo será notificado a la librería, y se estarán comunicando contigo para coordinar el pago y el envío. Total: UYU {total}",
     "fullNameLabel": "Nombre Completo",
     "fullNamePlaceholder": "Juan Pérez",
     "emailLabel": "Correo Electrónico",

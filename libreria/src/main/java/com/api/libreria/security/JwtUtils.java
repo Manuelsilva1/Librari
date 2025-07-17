@@ -13,7 +13,7 @@ public class JwtUtils {
 
     // Clave secreta (BASE64)
     private final String jwtSecretBase64 = "yW3WxPuq1MKgAwrmspr9qCc4UDe7BQbqV0z1kGMiAb7aJxW6FTnyEnNRQpqrZLNEJVtd1lAvRaJMNzkKt3K0RQ==";
-    private final long jwtExpirationMs = 7200000; // 2 horas
+    private final long jwtExpirationMs = 14400000; // 2 horas
 
     private SecretKey getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(jwtSecretBase64);
