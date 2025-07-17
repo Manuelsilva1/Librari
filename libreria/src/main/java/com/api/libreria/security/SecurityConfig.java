@@ -36,6 +36,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/ofertas/**").permitAll()
                 .requestMatchers("/api/cart/**").permitAll()
                 .requestMatchers("/uploads/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/pedidos/**").permitAll()
                 // rutas protegidas
                 .requestMatchers("/api/books/**").hasRole("ADMIN")
                 .requestMatchers("/api/ofertas/**").hasRole("ADMIN")
