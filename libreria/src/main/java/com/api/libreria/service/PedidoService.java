@@ -86,10 +86,18 @@ public class PedidoService {
     @Transactional
     public Pedido actualizarEstado(Long id, String status) {
         Pedido p = pedidoRepository.findById(id).orElseThrow();
+        String previousStatus = p.getStatus();
         p.setStatus(status);
         Pedido saved = pedidoRepository.save(p);
         if ("APPROVED".equalsIgnoreCase(status)) {
             ventaService.crearVentaDesdePedido(saved);
+        } else if ("CANCELLED".equalsIgnoreCase(status) &&
+                   !"CANCELLED".equalsIgnoreCase(previousStatus)) {
+            for (PedidoItem item : saved.getItems()) {
+                Book book = item.getBook();
+                book.setStock(book.getStock() + item.getCantidad());
+                bookRepository.save(book);
+            }
         }
         return saved;
     }
