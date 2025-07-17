@@ -19,7 +19,7 @@ interface FetchApiOptions extends RequestInit {
 
 async function fetchApi<T>(endpoint: string, options: FetchApiOptions = {}): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
-  const authHeaders = getAuthHeaders();
+  const authHeaders = await getAuthHeaders();
 
   const headers: Record<string, string> = {
     ...authHeaders,
@@ -76,7 +76,7 @@ async function fetchApi<T>(endpoint: string, options: FetchApiOptions = {}): Pro
 
 async function fetchApiText(endpoint: string, options: FetchApiOptions = {}): Promise<string> {
   const url = `${API_BASE_URL}${endpoint}`;
-  const authHeaders = getAuthHeaders();
+  const authHeaders = await getAuthHeaders();
 
   const headers: Record<string, string> = {
     ...authHeaders,
