@@ -149,10 +149,20 @@ export const getBooks = async (
     return mockApi.mockGetBooks();       // asegúrate de que esto retorna Book[]
   }
 
-  const query = new URLSearchParams(params).toString();   // '' si params === {}
-  const page: Page<Book> = await fetchApi<Page<Book>>(`/api/books${query ? '?' + query : ''}`);
+  if (params.page !== undefined || params.size !== undefined) {
+    const query = new URLSearchParams(params).toString();
+    const pageData = await fetchApi<Page<Book>>(`/api/books${query ? '?' + query : ''}`);
+    return pageData.content;
+  }
 
-  return page.content;                   // 👈  ahora sí es Book[]
+  const firstPage = await fetchApi<Page<Book>>('/api/books');
+  let books = [...firstPage.content];
+  for (let p = 1; p < firstPage.totalPages; p++) {
+    const query = new URLSearchParams({ ...params, page: p, size: firstPage.size }).toString();
+    const nextPage = await fetchApi<Page<Book>>(`/api/books?${query}`);
+    books = books.concat(nextPage.content);
+  }
+  return books;
 };
 
 interface Page<T> {
