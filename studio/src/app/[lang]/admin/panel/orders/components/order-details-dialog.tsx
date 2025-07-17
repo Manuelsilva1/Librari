@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import type { Pedido } from '@/types';
 import { updatePedidoStatus } from '@/services/api';
 import {
@@ -26,6 +26,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
 
 interface OrderDetailsDialogProps {
   order: Pedido | null;
@@ -36,19 +38,25 @@ interface OrderDetailsDialogProps {
 
 export function OrderDetailsDialog({ order, onClose, texts, onStatusUpdated }: OrderDetailsDialogProps) {
   const [status, setStatus] = useState(order?.status || 'PENDING');
+  const { toast } = useToast();
 
-  const statusClasses: Record<string, string> = {
-    PENDING: 'text-yellow-600',
-    APPROVED: 'text-green-600',
-    CANCELLED: 'text-red-600',
-  };
+  const total = useMemo(
+    () => order?.items.reduce((sum, it) => sum + (it.book?.precio ?? 0) * it.cantidad, 0) || 0,
+    [order]
+  );
+
 
   if (!order) return null;
 
   const handleUpdate = async () => {
-    await updatePedidoStatus(order.id, status);
-    onStatusUpdated();
-    onClose();
+    try {
+      await updatePedidoStatus(order.id, status);
+      toast({ title: texts.toastStatusUpdated || 'Status Updated!' });
+      onStatusUpdated();
+      onClose();
+    } catch (err) {
+      toast({ title: texts.toastErrorUpdatingStatus || 'Failed to update status', variant: 'destructive' });
+    }
   };
 
   return (
@@ -64,7 +72,14 @@ export function OrderDetailsDialog({ order, onClose, texts, onStatusUpdated }: O
           <p><strong>{texts.customerName || 'Customer'}:</strong> {order.nombre} ({order.email})</p>
           <p><strong>Celular:</strong> {order.celular}</p>
           <p><strong>Address:</strong> {order.direccion}, {order.ciudad}, {order.estado} {order.zip}</p>
-          <p><strong>{texts.status || 'Status'}:</strong> <span className={statusClasses[order.status] || ''}>{order.status}</span></p>
+          <p><strong>{texts.paymentMethod || 'Payment'}:</strong> {order.metodoPago || texts.notApplicable || 'N/A'}</p>
+          <p>
+            <strong>{texts.status || 'Status'}:</strong>{' '}
+            <Badge className="capitalize" variant={order.status === 'APPROVED' ? 'secondary' : order.status === 'CANCELLED' ? 'destructive' : 'outline'}>
+              {order.status}
+            </Badge>
+          </p>
+          <p><strong>{texts.total || 'Total'}:</strong> UYU {total.toFixed(2)}</p>
         </div>
         <div className="mt-4">
           <h4 className="font-semibold mb-2">{texts.items || 'Items'}</h4>
@@ -85,6 +100,16 @@ export function OrderDetailsDialog({ order, onClose, texts, onStatusUpdated }: O
             </TableBody>
           </Table>
         </div>
+        {order.historial && order.historial.length > 0 && (
+          <div className="mt-4">
+            <h4 className="font-semibold mb-2">{texts.history || 'History'}</h4>
+            <ul className="list-disc list-inside space-y-1 text-sm">
+              {order.historial.map((h, idx) => (
+                <li key={idx}>{h.status} - {new Date(h.fecha).toLocaleString()}</li>
+              ))}
+            </ul>
+          </div>
+        )}
         <div className="mt-4 space-y-2">
           <label className="block text-sm font-medium">{texts.status || 'Status'}</label>
           <Select value={status} onValueChange={setStatus}>
