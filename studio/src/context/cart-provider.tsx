@@ -76,15 +76,17 @@ export function CartProvider({ children }: CartProviderProps) {
         const existing = current.items.find(i => String(i.libroId) === String(bookId));
         let newItems: CartItem[];
         if (existing) {
+          const maxQty = Math.min(existing.cantidad + quantity, book.stock);
           newItems = current.items.map(i =>
             String(i.libroId) === String(bookId)
-              ? { ...i, cantidad: i.cantidad + quantity }
+              ? { ...i, cantidad: maxQty }
               : i,
           );
         } else {
+          const allowedQty = Math.min(quantity, book.stock);
           const newItem: CartItem = {
             libroId: bookId,
-            cantidad: quantity,
+            cantidad: allowedQty,
             precioUnitario: book.precio,
             libro: book,
           };
@@ -118,8 +120,11 @@ export function CartProvider({ children }: CartProviderProps) {
     }
     setCart(prev => {
       if (!prev) return prev;
+      const item = prev.items.find(i => String(i.libroId) === String(itemId));
+      const stockLimit = item?.libro?.stock ?? newQuantity;
+      const qty = Math.min(newQuantity, stockLimit);
       const newItems = prev.items.map(i =>
-        String(i.libroId) === String(itemId) ? { ...i, cantidad: newQuantity } : i,
+        String(i.libroId) === String(itemId) ? { ...i, cantidad: qty } : i,
       );
       const newCart = { ...prev, items: newItems };
       newCart.total = newItems.reduce((t, it) => t + it.precioUnitario * it.cantidad, 0);
