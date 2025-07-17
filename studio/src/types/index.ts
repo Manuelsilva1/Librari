@@ -501,10 +501,17 @@ export type Dictionary = {
         september: string; october: string; november: string; december: string;
       };
     };
-    ordersPage: {
-      title: string;
-      customerName: string;
-    };
+      ordersPage: {
+        title: string;
+        customerName: string;
+        approve?: string;
+        cancel?: string;
+        viewDetails?: string;
+        closeButton?: string;
+        items?: string;
+        status?: string;
+        updateStatus?: string;
+      };
     statsPage: {
       title: string;
       salesOverTimeTitle: string;

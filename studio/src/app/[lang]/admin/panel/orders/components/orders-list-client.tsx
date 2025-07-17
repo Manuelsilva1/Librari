@@ -4,10 +4,12 @@ import { getAdminPedidos, updatePedidoStatus } from '@/services/api';
 import type { Pedido } from '@/types';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
+import { OrderDetailsDialog } from './order-details-dialog';
 
 export function OrdersListClient({ texts }: { texts: any }) {
   const [orders, setOrders] = useState<Pedido[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedOrder, setSelectedOrder] = useState<Pedido | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -35,32 +37,43 @@ export function OrdersListClient({ texts }: { texts: any }) {
   if (orders.length === 0) return <p>No orders found.</p>;
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>ID</TableHead>
-          <TableHead>{texts?.customerName || 'Customer'}</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Actions</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {orders.map(o => (
-          <TableRow key={o.id}>
-            <TableCell>{o.id}</TableCell>
-            <TableCell>{o.nombre}</TableCell>
-            <TableCell>{o.status}</TableCell>
-            <TableCell className="space-x-2">
-              {o.status !== 'APPROVED' && (
-                <Button size="sm" onClick={() => handleApprove(o.id)}>{texts?.approve || 'Approve'}</Button>
-              )}
-              {o.status !== 'CANCELLED' && (
-                <Button variant="destructive" size="sm" onClick={() => handleCancel(o.id)}>{texts?.cancel || 'Cancel'}</Button>
-              )}
-            </TableCell>
+    <>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>ID</TableHead>
+            <TableHead>{texts?.customerName || 'Customer'}</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {orders.map(o => (
+            <TableRow key={o.id}>
+              <TableCell>{o.id}</TableCell>
+              <TableCell>{o.nombre}</TableCell>
+              <TableCell>{o.status}</TableCell>
+              <TableCell className="space-x-2">
+                <Button variant="outline" size="sm" onClick={() => setSelectedOrder(o)}>
+                  {texts?.viewDetails || 'View Details'}
+                </Button>
+                {o.status !== 'APPROVED' && (
+                  <Button size="sm" onClick={() => handleApprove(o.id)}>{texts?.approve || 'Approve'}</Button>
+                )}
+                {o.status !== 'CANCELLED' && (
+                  <Button variant="destructive" size="sm" onClick={() => handleCancel(o.id)}>{texts?.cancel || 'Cancel'}</Button>
+                )}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      <OrderDetailsDialog
+        order={selectedOrder}
+        onClose={() => setSelectedOrder(null)}
+        texts={texts}
+        onStatusUpdated={load}
+      />
+    </>
   );
 }
