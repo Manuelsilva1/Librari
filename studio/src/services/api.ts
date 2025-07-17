@@ -231,12 +231,22 @@ export const getCategories = async (
 ): Promise<Category[]> => {
   if (API_MODE === 'mock') return mockApi.mockGetCategories();
 
-  const query = new URLSearchParams(params).toString();
-  const page: Page<Category> = await fetchApi<Page<Category>>(
-    `/api/categorias${query ? '?' + query : ''}`,
-  );
+  if (params.page !== undefined || params.size !== undefined) {
+    const query = new URLSearchParams(params).toString();
+    const pageData = await fetchApi<Page<Category>>(
+      `/api/categorias${query ? '?' + query : ''}`,
+    );
+    return pageData.content;
+  }
 
-  return page.content;
+  const firstPage = await fetchApi<Page<Category>>('/api/categorias');
+  let categories = [...firstPage.content];
+  for (let p = 1; p < firstPage.totalPages; p++) {
+    const query = new URLSearchParams({ ...params, page: p, size: firstPage.size }).toString();
+    const nextPage = await fetchApi<Page<Category>>(`/api/categorias?${query}`);
+    categories = categories.concat(nextPage.content);
+  }
+  return categories;
 };
 
 export const getCategoryById = async (id: string | number): Promise<Category> => {
