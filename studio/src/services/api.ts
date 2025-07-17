@@ -284,12 +284,28 @@ export const getEditorials = async (
 ): Promise<Editorial[]> => {
   if (API_MODE === 'mock') return mockApi.mockGetEditorials();
 
-  const query = new URLSearchParams(params).toString();
-  const page: Page<Editorial> = await fetchApi<Page<Editorial>>(
-    `/api/editoriales${query ? '?' + query : ''}`,
-  );
+  if (params.page !== undefined || params.size !== undefined) {
+    const query = new URLSearchParams(params).toString();
+    const pageData = await fetchApi<Page<Editorial>>(
+      `/api/editoriales${query ? '?' + query : ''}`,
+    );
+    return pageData.content;
+  }
 
-  return page.content;
+  const firstPage = await fetchApi<Page<Editorial>>('/api/editoriales');
+  let editorials = [...firstPage.content];
+  for (let p = 1; p < firstPage.totalPages; p++) {
+    const query = new URLSearchParams({
+      ...params,
+      page: p,
+      size: firstPage.size,
+    }).toString();
+    const nextPage = await fetchApi<Page<Editorial>>(
+      `/api/editoriales?${query}`,
+    );
+    editorials = editorials.concat(nextPage.content);
+  }
+  return editorials;
 };
 
 export const createEditorial = async (editorialData: Partial<Editorial>): Promise<Editorial> => {
