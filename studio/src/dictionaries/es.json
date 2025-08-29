@@ -326,6 +326,11 @@
       "allMonths": "Todos los Meses",
       "allPaymentMethods": "Todos",
       "resetFiltersButton": "Restablecer Filtros",
+      "filterByDateLabel": "Fecha",
+      "clearDateFilter": "Limpiar",
+      "prev": "Anterior",
+      "next": "Siguiente",
+      "pageIndicator": "Página {currentPage} de {totalPages}",
       "months": {
         "january": "Enero",
         "february": "Febrero",
