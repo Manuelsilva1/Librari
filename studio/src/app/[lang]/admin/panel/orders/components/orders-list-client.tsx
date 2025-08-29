@@ -153,7 +153,11 @@ export function OrdersListClient({ texts }: { texts: any }) {
               <TableCell>{o.metodoPago || texts.notApplicable || 'N/A'}</TableCell>
               <TableCell>
                 <Badge
-                  className="capitalize"
+                  className={`capitalize ${
+                    o.status === 'APPROVED' 
+                      ? 'bg-green-500 text-white border-green-500 hover:bg-green-600' 
+                      : ''
+                  }`}
                   variant={o.status === 'APPROVED' ? 'secondary' : o.status === 'CANCELLED' ? 'destructive' : 'outline'}
                 >
                   {o.status}

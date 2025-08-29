@@ -4,8 +4,10 @@ import com.api.libreria.model.Venta;
 import com.api.libreria.repository.UserRepository;
 import com.api.libreria.repository.VentaRepository;
 import com.api.libreria.dto.CreateSaleRequest;
+import com.api.libreria.dto.InvoiceDTO;
 import com.api.libreria.service.VentaService;
 import java.util.List;
+import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -73,13 +75,16 @@ public class VentaController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping(value = "/admin/{id}/invoice", produces = "text/html")
+    @GetMapping(value = "/admin/{id}/invoice", produces = "application/json")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> getVentaAdminInvoice(@PathVariable Long id) {
+    public ResponseEntity<InvoiceDTO> getVentaAdminInvoice(@PathVariable Long id) {
         return ventaService.getVentaWithItemsById(id)
-                .map(v -> ResponseEntity.ok(ventaService.generateInvoiceHtml(v)))
+                .map(v -> ResponseEntity.ok(ventaService.generateInvoiceDTO(v)))
                 .orElse(ResponseEntity.notFound().build());
     }
+
+
+
 
     private Long getUserId(String nombre) {
         // Auth stores the username value, so search by username instead of email

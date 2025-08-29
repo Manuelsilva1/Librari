@@ -3,6 +3,7 @@ package com.api.libreria.service;
 import com.api.libreria.model.*;
 import com.api.libreria.repository.*;
 import com.api.libreria.dto.CreateSaleItemRequest;
+import com.api.libreria.dto.InvoiceDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -182,6 +183,109 @@ public class VentaService  {
             v.getItems().size(); // force lazy collection initialization
             return v;
         });
+    }
+
+    public InvoiceDTO generateInvoiceDTO(Venta venta) {
+        System.out.println("=== INICIO: generateInvoiceDTO ===");
+        System.out.println("1. Parámetros recibidos:");
+        System.out.println("   - Venta ID: " + venta.getId());
+        System.out.println("   - Usuario ID: " + venta.getUsuarioId());
+        System.out.println("   - Venta toString: " + venta.toString());
+        
+        User customer = null;
+        
+        // Sección 1: Validación del usuario ID
+        System.out.println("\n2. Validación del usuario ID:");
+        if (venta.getUsuarioId() != null) {
+            System.out.println("   ✅ Hay usuario asociado: " + venta.getUsuarioId());
+            
+            // Sección 2: Búsqueda del usuario
+            System.out.println("\n3. Búsqueda del usuario en la base de datos:");
+            System.out.println("   → Llamando a userRepository.findById(" + venta.getUsuarioId() + ")");
+            
+            try {
+                var userOptional = userRepository.findById(venta.getUsuarioId());
+                
+                if (userOptional.isEmpty()) {
+                    System.out.println("   ❌ ERROR: Usuario no encontrado con ID: " + venta.getUsuarioId());
+                    System.out.println("   → Lanzando RuntimeException");
+                    System.out.println("=== FIN: generateInvoiceDTO (ERROR) ===");
+                    throw new RuntimeException("Usuario no encontrado");
+                }
+                
+                customer = userOptional.get();
+                System.out.println("   ✅ Usuario encontrado:");
+                System.out.println("      - ID: " + customer.getId());
+                System.out.println("      - Username: " + customer.getUsername());
+                System.out.println("      - Email: " + customer.getEmail());
+                System.out.println("      - Role: " + customer.getRole());
+                
+            } catch (Exception e) {
+                System.out.println("   ❌ ERROR al buscar el usuario:");
+                System.out.println("      - Excepción: " + e.getClass().getSimpleName());
+                System.out.println("      - Mensaje: " + e.getMessage());
+                e.printStackTrace();
+                System.out.println("=== FIN: generateInvoiceDTO (ERROR) ===");
+                throw e;
+            }
+            
+        } else {
+            System.out.println("   ⚠️ No hay usuario asociado");
+            System.out.println("   → Creando usuario anónimo");
+            
+            // Sección 3: Creación de usuario anónimo
+            customer = new User();
+            customer.setId(null);
+            customer.setUsername("Desconocido");
+            customer.setEmail("N/A");
+            customer.setRole("USER");
+            
+            System.out.println("   ✅ Usuario anónimo creado:");
+            System.out.println("      - Username: " + customer.getUsername());
+            System.out.println("      - Email: " + customer.getEmail());
+        }
+        
+        // Sección 4: Generación del DTO
+        System.out.println("\n4. Generación del InvoiceDTO:");
+        System.out.println("   → Llamando a InvoiceDTO.fromVenta()");
+        System.out.println("   → Customer: " + customer);
+        
+        try {
+            var invoiceDTO = InvoiceDTO.fromVenta(venta, customer);
+            System.out.println("   ✅ InvoiceDTO generado exitosamente:");
+            System.out.println("      - ID: " + invoiceDTO.getId());
+            System.out.println("      - Número de ticket: " + invoiceDTO.getNumeroTicket());
+            System.out.println("      - Total: " + invoiceDTO.getTotal());
+            System.out.println("      - Cliente: " + (invoiceDTO.getCustomer() != null ? invoiceDTO.getCustomer().getUsername() : "null"));
+            System.out.println("      - Cantidad de items: " + (invoiceDTO.getItems() != null ? invoiceDTO.getItems().size() : "null"));
+            System.out.println("      - Status: " + invoiceDTO.getStatus());
+            System.out.println("      - Currency: " + invoiceDTO.getCurrency());
+            
+            // Log detallado de items si existen
+            if (invoiceDTO.getItems() != null && !invoiceDTO.getItems().isEmpty()) {
+                System.out.println("      - Detalle de items:");
+                for (int i = 0; i < invoiceDTO.getItems().size(); i++) {
+                    var item = invoiceDTO.getItems().get(i);
+                    System.out.println("        Item " + (i + 1) + ":");
+                    System.out.println("          - ID: " + item.getId());
+                    System.out.println("          - Libro: " + (item.getBook() != null ? item.getBook().getTitulo() : "null"));
+                    System.out.println("          - Cantidad: " + item.getCantidad());
+                    System.out.println("          - Precio unitario: " + item.getPrecioUnitario());
+                    System.out.println("          - Subtotal: " + item.getSubtotal());
+                }
+            }
+            
+            System.out.println("=== FIN: generateInvoiceDTO (SUCCESS) ===");
+            return invoiceDTO;
+            
+        } catch (Exception e) {
+            System.out.println("   ❌ ERROR al generar InvoiceDTO:");
+            System.out.println("      - Excepción: " + e.getClass().getSimpleName());
+            System.out.println("      - Mensaje: " + e.getMessage());
+            e.printStackTrace();
+            System.out.println("=== FIN: generateInvoiceDTO (ERROR) ===");
+            throw e;
+        }
     }
 
     public String generateInvoiceHtml(Venta venta) {

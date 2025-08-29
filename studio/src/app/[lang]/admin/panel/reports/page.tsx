@@ -52,7 +52,10 @@ export default async function AdminReportsPage({ params }: AdminReportsPageProps
     editorial: "Publisher",
     // Add any other texts ReportsClient might need from the mock that are not in the dictionary
     cash: "Cash", // Example if payment methods are localized
-    card: "Card"  // Example
+    card: "Card",  // Example
+    reportFor: "Report for",
+    editorial: "Publisher",
+    configureAndGenerateReports: "Configure and generate detailed sales reports"
   };
 
   // initialSalesData is no longer fetched here; ReportsClient fetches its own data.

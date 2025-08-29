@@ -37,10 +37,12 @@ public class SecurityConfig {
                 .requestMatchers("/api/cart/**").permitAll()
                 .requestMatchers("/uploads/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/pedidos/**").permitAll()
+                .requestMatchers("/api/ventas/public/**").permitAll()
                 // rutas protegidas
                 .requestMatchers("/api/books/**").hasRole("ADMIN")
                 .requestMatchers("/api/ofertas/**").hasRole("ADMIN")
                 .requestMatchers("/api/ventas/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/ventas/test/**").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                  .requestMatchers("/api/usuarios/**").hasRole("ADMIN")
                 .anyRequest().authenticated()

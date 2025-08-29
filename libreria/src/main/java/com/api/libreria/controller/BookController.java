@@ -107,11 +107,18 @@ public class BookController {
         existing.setStock(request.getStock());
         existing.setDescripcion(request.getDescripcion());
         if (file != null && !file.isEmpty()) {
-            String fileName = UUID.randomUUID() + "-" + file.getOriginalFilename();
-            Path dir = Paths.get(uploadDir);
+            // ✨ Ruta absoluta definida por ti
+            Path dir = Paths.get("C:\\Users\\manue\\OneDrive\\Documentos\\Desarrollo\\librari\\libreria\\uploads");
             Files.createDirectories(dir);
+
+            String fileName = UUID.randomUUID() + "-" + file.getOriginalFilename();
             Path path = dir.resolve(fileName);
-            file.transferTo(path.toFile());
+
+            file.transferTo(path);
+
+            System.out.println("Archivo guardado en: " + path.toAbsolutePath());
+
+            // Guarda la ruta absoluta
             existing.setCoverImage("/uploads/" + fileName);
         } else {
             existing.setCoverImage(request.getCoverImage());

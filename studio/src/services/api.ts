@@ -150,7 +150,10 @@ export const getBooks = async (
   }
 
   if (params.page !== undefined || params.size !== undefined) {
-    const query = new URLSearchParams(params).toString();
+    const queryParams = Object.fromEntries(
+      Object.entries(params).map(([key, value]) => [key, String(value)])
+    );
+    const query = new URLSearchParams(queryParams).toString();
     const pageData = await fetchApi<Page<Book>>(`/api/books${query ? '?' + query : ''}`);
     return pageData.content;
   }
@@ -158,7 +161,10 @@ export const getBooks = async (
   const firstPage = await fetchApi<Page<Book>>('/api/books');
   let books = [...firstPage.content];
   for (let p = 1; p < firstPage.totalPages; p++) {
-    const query = new URLSearchParams({ ...params, page: p, size: firstPage.size }).toString();
+    const queryParams = Object.fromEntries(
+      Object.entries({ ...params, page: p, size: firstPage.size }).map(([key, value]) => [key, String(value)])
+    );
+    const query = new URLSearchParams(queryParams).toString();
     const nextPage = await fetchApi<Page<Book>>(`/api/books?${query}`);
     books = books.concat(nextPage.content);
   }
@@ -232,7 +238,10 @@ export const getCategories = async (
   if (API_MODE === 'mock') return mockApi.mockGetCategories();
 
   if (params.page !== undefined || params.size !== undefined) {
-    const query = new URLSearchParams(params).toString();
+    const queryParams = Object.fromEntries(
+      Object.entries(params).map(([key, value]) => [key, String(value)])
+    );
+    const query = new URLSearchParams(queryParams).toString();
     const pageData = await fetchApi<Page<Category>>(
       `/api/categorias${query ? '?' + query : ''}`,
     );
@@ -242,7 +251,10 @@ export const getCategories = async (
   const firstPage = await fetchApi<Page<Category>>('/api/categorias');
   let categories = [...firstPage.content];
   for (let p = 1; p < firstPage.totalPages; p++) {
-    const query = new URLSearchParams({ ...params, page: p, size: firstPage.size }).toString();
+    const queryParams = Object.fromEntries(
+      Object.entries({ ...params, page: p, size: firstPage.size }).map(([key, value]) => [key, String(value)])
+    );
+    const query = new URLSearchParams(queryParams).toString();
     const nextPage = await fetchApi<Page<Category>>(`/api/categorias?${query}`);
     categories = categories.concat(nextPage.content);
   }
@@ -285,7 +297,10 @@ export const getEditorials = async (
   if (API_MODE === 'mock') return mockApi.mockGetEditorials();
 
   if (params.page !== undefined || params.size !== undefined) {
-    const query = new URLSearchParams(params).toString();
+    const queryParams = Object.fromEntries(
+      Object.entries(params).map(([key, value]) => [key, String(value)])
+    );
+    const query = new URLSearchParams(queryParams).toString();
     const pageData = await fetchApi<Page<Editorial>>(
       `/api/editoriales${query ? '?' + query : ''}`,
     );
@@ -295,11 +310,14 @@ export const getEditorials = async (
   const firstPage = await fetchApi<Page<Editorial>>('/api/editoriales');
   let editorials = [...firstPage.content];
   for (let p = 1; p < firstPage.totalPages; p++) {
-    const query = new URLSearchParams({
-      ...params,
-      page: p,
-      size: firstPage.size,
-    }).toString();
+    const queryParams = Object.fromEntries(
+      Object.entries({
+        ...params,
+        page: p,
+        size: firstPage.size,
+      }).map(([key, value]) => [key, String(value)])
+    );
+    const query = new URLSearchParams(queryParams).toString();
     const nextPage = await fetchApi<Page<Editorial>>(
       `/api/editoriales?${query}`,
     );
@@ -417,8 +435,301 @@ export const updatePedidoStatus = async (id: string | number, status: string): P
 
 export const getAdminSaleInvoice = async (saleId: string | number): Promise<string> => {
   if (API_MODE === 'mock') return mockApi.mockGetAdminSaleInvoice(saleId);
-  return fetchApiText(`/api/ventas/admin/${saleId}/invoice`, { headers: { Accept: 'text/html' } });
+  
+  // Get JSON data from API
+  const invoiceData = await fetchApi<any>(`/api/ventas/admin/${saleId}/invoice`);
+  
+  // Generate beautiful HTML invoice from JSON data
+  return generateBeautifulInvoice(invoiceData);
 };
+
+function generateBeautifulInvoice(data: any): string {
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('es-US', {
+      style: 'currency',
+      currency: data.currency || 'USD'
+    }).format(amount);
+  };
+
+  return `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factura #${data.numeroTicket} - Librari</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8f9fa;
+        }
+        
+        .invoice-container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .invoice-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .invoice-header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+        
+        .invoice-header .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .invoice-content {
+            padding: 40px;
+        }
+        
+        .invoice-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .info-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .info-section p {
+            margin-bottom: 8px;
+            color: #555;
+        }
+        
+        .info-section .highlight {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .items-table th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 500;
+        }
+        
+        .items-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .items-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .items-table .book-title {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .items-table .book-author {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 4px;
+        }
+        
+        .items-table .quantity {
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .items-table .price {
+            text-align: right;
+            font-weight: 500;
+        }
+        
+        .items-table .subtotal {
+            text-align: right;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .total-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: right;
+        }
+        
+        .total-section h2 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+        
+        .total-section .total-amount {
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+        
+        .footer {
+            background: #f8f9fa;
+            padding: 30px 40px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #eee;
+        }
+        
+        .footer .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .footer .tagline {
+            font-style: italic;
+            margin-bottom: 15px;
+        }
+        
+        .footer .contact {
+            font-size: 0.9em;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            .invoice-container {
+                box-shadow: none;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <div class="invoice-header">
+            <h1>FACTURA</h1>
+            <div class="subtitle">Librari - Tu librería de confianza</div>
+        </div>
+        
+        <div class="invoice-content">
+            <div class="invoice-info">
+                <div class="info-section">
+                    <h3>Información de la Factura</h3>
+                    <p><strong>Número de Factura:</strong> #${data.numeroTicket}</p>
+                    <p><strong>Fecha:</strong> ${formatDate(data.fecha)}</p>
+                    <p><strong>Estado:</strong> <span class="status-badge">${data.status}</span></p>
+                    <p><strong>Método de Pago:</strong> ${data.metodoPago}</p>
+                </div>
+                
+                <div class="info-section">
+                    <h3>Información del Cliente</h3>
+                    <p><strong>Cliente:</strong> ${data.customer.username}</p>
+                    <p><strong>Email:</strong> ${data.customer.email}</p>
+                    <p><strong>ID Cliente:</strong> ${data.customer.id}</p>
+                </div>
+            </div>
+            
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th style="text-align: center;">Cantidad</th>
+                        <th style="text-align: right;">Precio Unitario</th>
+                        <th style="text-align: right;">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                                         ${data.items.map((item: any) => `
+                        <tr>
+                            <td>
+                                <div class="book-title">${item.book.titulo}</div>
+                                <div class="book-author">por ${item.book.autor}</div>
+                                <div style="font-size: 0.8em; color: #999; margin-top: 4px;">ISBN: ${item.book.isbn}</div>
+                            </td>
+                            <td class="quantity">${item.cantidad}</td>
+                            <td class="price">${formatCurrency(item.precioUnitario)}</td>
+                            <td class="subtotal">${formatCurrency(item.subtotal)}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+            
+            <div class="total-section">
+                <h2>Total de la Compra</h2>
+                <div class="total-amount">${formatCurrency(data.total)}</div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <div class="logo">📚 Librari</div>
+            <div class="tagline">"Donde las historias cobran vida"</div>
+            <div class="contact">
+                <p>Gracias por tu compra</p>
+                <p>Para consultas: contacto@librari.com</p>
+                <p>© 2024 Librari. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+  `;
+}
 
 export const getDashboardStats = async (): Promise<DashboardStats> => {
   if (API_MODE === 'mock') {

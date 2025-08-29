@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba Endpoint Público de Factura</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .json-viewer {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Prueba Endpoint Público de Factura</h1>
+    
+    <div class="test-section">
+        <h3>1. Probar endpoint público de ping</h3>
+        <button onclick="testPing()">Probar /api/ventas/public/ping</button>
+        <div id="pingResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>2. Probar endpoint público de factura (ID 4)</h3>
+        <button onclick="testInvoice()">Probar /api/ventas/public/admin/4/invoice</button>
+        <div id="invoiceResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>3. Probar endpoint público de factura (ID 1)</h3>
+        <button onclick="testInvoice1()">Probar /api/ventas/public/admin/1/invoice</button>
+        <div id="invoiceResult1" class="result"></div>
+    </div>
+
+    <script>
+        async function testPing() {
+            const resultDiv = document.getElementById('pingResult');
+            resultDiv.textContent = 'Probando...';
+            resultDiv.className = 'result';
+            
+            try {
+                const response = await fetch('http://localhost:8081/api/ventas/public/ping');
+                const data = await response.text();
+                
+                if (response.ok) {
+                    resultDiv.textContent = `✅ Éxito (${response.status}): ${data}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.textContent = `❌ Error (${response.status}): ${data}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.textContent = `❌ Error de conexión: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        async function testInvoice() {
+            const resultDiv = document.getElementById('invoiceResult');
+            resultDiv.textContent = 'Probando...';
+            resultDiv.className = 'result';
+            
+            try {
+                const response = await fetch('http://localhost:8081/api/ventas/public/admin/4/invoice');
+                const data = await response.text();
+                
+                if (response.ok) {
+                    try {
+                        const jsonData = JSON.parse(data);
+                        resultDiv.innerHTML = `
+                            <div class="success">✅ Éxito (${response.status})</div>
+                            <div class="json-viewer">${JSON.stringify(jsonData, null, 2)}</div>
+                        `;
+                        resultDiv.className = 'result success';
+                    } catch (e) {
+                        resultDiv.textContent = `✅ Éxito (${response.status}): ${data.substring(0, 200)}...`;
+                        resultDiv.className = 'result success';
+                    }
+                } else {
+                    resultDiv.textContent = `❌ Error (${response.status}): ${data}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.textContent = `❌ Error de conexión: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        async function testInvoice1() {
+            const resultDiv = document.getElementById('invoiceResult1');
+            resultDiv.textContent = 'Probando...';
+            resultDiv.className = 'result';
+            
+            try {
+                const response = await fetch('http://localhost:8081/api/ventas/public/admin/1/invoice');
+                const data = await response.text();
+                
+                if (response.ok) {
+                    try {
+                        const jsonData = JSON.parse(data);
+                        resultDiv.innerHTML = `
+                            <div class="success">✅ Éxito (${response.status})</div>
+                            <div class="json-viewer">${JSON.stringify(jsonData, null, 2)}</div>
+                        `;
+                        resultDiv.className = 'result success';
+                    } catch (e) {
+                        resultDiv.textContent = `✅ Éxito (${response.status}): ${data.substring(0, 200)}...`;
+                        resultDiv.className = 'result success';
+                    }
+                } else {
+                    resultDiv.textContent = `❌ Error (${response.status}): ${data}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.textContent = `❌ Error de conexión: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+    </script>
+</body>
+</html>

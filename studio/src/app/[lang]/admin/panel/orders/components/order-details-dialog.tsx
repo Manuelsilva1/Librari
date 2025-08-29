@@ -75,7 +75,14 @@ export function OrderDetailsDialog({ order, onClose, texts, onStatusUpdated }: O
           <p><strong>{texts.paymentMethod || 'Payment'}:</strong> {order.metodoPago || texts.notApplicable || 'N/A'}</p>
           <p>
             <strong>{texts.status || 'Status'}:</strong>{' '}
-            <Badge className="capitalize" variant={order.status === 'APPROVED' ? 'secondary' : order.status === 'CANCELLED' ? 'destructive' : 'outline'}>
+            <Badge 
+              className={`capitalize ${
+                order.status === 'APPROVED' 
+                  ? 'bg-green-500 text-white border-green-500 hover:bg-green-600' 
+                  : ''
+              }`}
+              variant={order.status === 'APPROVED' ? 'secondary' : order.status === 'CANCELLED' ? 'destructive' : 'outline'}
+            >
               {order.status}
             </Badge>
           </p>

@@ -86,8 +86,8 @@ export interface Sale {
   fecha: string; // ISO date string typically
   total: number;
   items: SaleItem[];
+  paymentMethod?: 'cash' | 'card' | string; // Payment method used for the sale
   // Fields from original SaleRecord that might be relevant:
-  // paymentMethod?: 'cash' | 'card' | string; 
   // customerName?: string; 
 }
 

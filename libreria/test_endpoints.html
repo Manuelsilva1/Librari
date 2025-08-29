@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Endpoints de Factura</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            white-space: pre-wrap;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+    </style>
+</head>
+<body>
+    <h1>Prueba de Endpoints de Factura</h1>
+    
+    <div class="test-section">
+        <h3>0. Probar conexión básica</h3>
+        <button onclick="testPingEndpoint()">Probar /api/ventas/test/ping</button>
+        <div id="pingResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>1. Probar endpoint de información (sin autenticación)</h3>
+        <button onclick="testInfoEndpoint()">Probar /api/ventas/test/4/info</button>
+        <div id="infoResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>2. Probar endpoint de factura (sin autenticación)</h3>
+        <button onclick="testInvoiceEndpoint()">Probar /api/ventas/test/4/invoice</button>
+        <div id="invoiceResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>3. Probar endpoint original (requiere autenticación ADMIN)</h3>
+        <button onclick="testOriginalEndpoint()">Probar /api/ventas/admin/4/invoice</button>
+        <div id="originalResult" class="result"></div>
+    </div>
+
+    <script>
+        async function testPingEndpoint() {
+            const resultDiv = document.getElementById('pingResult');
+            resultDiv.textContent = 'Probando...';
+            resultDiv.className = 'result';
+            
+            try {
+                const response = await fetch('http://localhost:8081/api/ventas/test/ping');
+                const data = await response.text();
+                
+                if (response.ok) {
+                    resultDiv.textContent = `✅ Éxito (${response.status}): ${data}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.textContent = `❌ Error (${response.status}): ${data}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.textContent = `❌ Error de conexión: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        async function testInfoEndpoint() {
+            const resultDiv = document.getElementById('infoResult');
+            resultDiv.textContent = 'Probando...';
+            resultDiv.className = 'result';
+            
+            try {
+                const response = await fetch('http://localhost:8081/api/ventas/test/4/info');
+                const data = await response.text();
+                
+                if (response.ok) {
+                    resultDiv.textContent = `✅ Éxito (${response.status}): ${data}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.textContent = `❌ Error (${response.status}): ${data}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.textContent = `❌ Error de conexión: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        async function testInvoiceEndpoint() {
+            const resultDiv = document.getElementById('invoiceResult');
+            resultDiv.textContent = 'Probando...';
+            resultDiv.className = 'result';
+            
+            try {
+                const response = await fetch('http://localhost:8081/api/ventas/test/4/invoice');
+                const data = await response.text();
+                
+                if (response.ok) {
+                    resultDiv.textContent = `✅ Éxito (${response.status}): ${data.substring(0, 200)}...`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.textContent = `❌ Error (${response.status}): ${data}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.textContent = `❌ Error de conexión: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        async function testOriginalEndpoint() {
+            const resultDiv = document.getElementById('originalResult');
+            resultDiv.textContent = 'Probando...';
+            resultDiv.className = 'result';
+            
+            try {
+                const response = await fetch('http://localhost:8081/api/ventas/admin/4/invoice');
+                const data = await response.text();
+                
+                if (response.ok) {
+                    resultDiv.textContent = `✅ Éxito (${response.status}): ${data.substring(0, 200)}...`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.textContent = `❌ Error (${response.status}): ${data}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.textContent = `❌ Error de conexión: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+    </script>
+</body>
+</html>

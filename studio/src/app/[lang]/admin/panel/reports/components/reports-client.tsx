@@ -2,13 +2,13 @@
 "use client";
 
 import { useState, useMemo, useEffect, useCallback } from 'react';
-import type { Editorial, Sale, Dictionary, ApiResponseError, Book } from '@/types'; // Ensure Sale type, not SaleRecord
+import type { Editorial, Sale, Dictionary, ApiResponseError, Book, Category } from '@/types'; // Ensure Sale type, not SaleRecord
 import {
   startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth,
   format, parseISO, eachDayOfInterval, eachWeekOfInterval, eachMonthOfInterval,
   isWithinInterval, subDays
 } from 'date-fns';
-import { es as esLocale, enUS as enLocale } from 'date-fns/locale';
+import { es as esLocale, enUS as enLocale, type Locale } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,7 +20,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { CalendarIcon, FileText, Download, Loader2, AlertTriangle, Building2 } from 'lucide-react';
 import type { DateRange } from 'react-day-picker';
-import { getEditorials as apiGetEditorials, getAdminSales as apiGetAdminSales } from '@/services/api'; 
+import { getEditorials as apiGetEditorials, getAdminSales as apiGetAdminSales, getCategories as apiGetCategories } from '@/services/api'; 
 
 interface ReportsClientProps {
   texts: Dictionary['adminPanel']['reportsPage'];
@@ -54,6 +54,7 @@ export function ReportsClient({ texts, lang, dictionary }: ReportsClientProps) {
   const [summaryLevel, setSummaryLevel] = useState<SummaryLevel>('none');
   const [selectedEditorialId, setSelectedEditorialId] = useState<string>('all');
   const [editorialsList, setEditorialsList] = useState<Editorial[]>([]); 
+  const [categoriesList, setCategoriesList] = useState<Category[]>([]);
   const [allSalesData, setAllSalesData] = useState<Sale[]>([]);
   const [reportData, setReportData] = useState<ReportData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -69,11 +70,13 @@ export function ReportsClient({ texts, lang, dictionary }: ReportsClientProps) {
       setIsLoading(true);
       setError(null);
       try {
-        const [editorialsData, salesApiData] = await Promise.all([
+        const [editorialsData, categoriesData, salesApiData] = await Promise.all([
           apiGetEditorials(),
+          apiGetCategories(),
           apiGetAdminSales()
         ]);
         setEditorialsList(editorialsData);
+        setCategoriesList(categoriesData);
         setAllSalesData(salesApiData);
       } catch (err) {
         const apiError = err as ApiResponseError;
@@ -96,8 +99,7 @@ export function ReportsClient({ texts, lang, dictionary }: ReportsClientProps) {
 
     const salesByPaymentMethod: ReportData['salesByPaymentMethod'] = Object.values(
       salesToProcess.reduce((acc, sale) => {
-        // Assuming 'paymentMethod' might be added to Sale type or is available via other means
-        const method = (sale as any).paymentMethod || 'unknown'; 
+        const method = sale.paymentMethod || 'unknown'; 
         acc[method] = acc[method] || { method: method, amount: 0, count: 0 };
         acc[method].amount += sale.total;
         acc[method].count += 1;
@@ -109,10 +111,11 @@ export function ReportsClient({ texts, lang, dictionary }: ReportsClientProps) {
     salesToProcess.forEach(sale => {
       sale.items.forEach(item => {
         const bookDetail = item.libro; // Assuming item.libro is populated
-        const category = bookDetail?.categoriaId ? String(bookDetail.categoriaId) : 'N/A';
-        salesByCategoryMap[category] = salesByCategoryMap[category] || { category, quantity: 0, amount: 0 };
-        salesByCategoryMap[category].quantity += item.cantidad;
-        salesByCategoryMap[category].amount += item.precioUnitario * item.cantidad;
+        const categoryId = bookDetail?.categoriaId ? String(bookDetail.categoriaId) : 'N/A';
+        const categoryName = categoriesList.find(cat => String(cat.id) === categoryId)?.nombre || categoryId;
+        salesByCategoryMap[categoryId] = salesByCategoryMap[categoryId] || { category: categoryName, quantity: 0, amount: 0 };
+        salesByCategoryMap[categoryId].quantity += item.cantidad;
+        salesByCategoryMap[categoryId].amount += item.precioUnitario * item.cantidad;
       });
     });
     const salesByCategory = Object.values(salesByCategoryMap).sort((a,b) => b.quantity - a.quantity);
