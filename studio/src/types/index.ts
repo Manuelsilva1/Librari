@@ -501,6 +501,11 @@ export type Dictionary = {
       allMonths: string;
       allPaymentMethods: string;
       resetFiltersButton: string;
+      filterByDateLabel?: string;
+      clearDateFilter?: string;
+      prev?: string;
+      next?: string;
+      pageIndicator?: string;
       months: {
         january: string; february: string; march: string; april: string;
         may: string; june: string; july: string; august: string;
